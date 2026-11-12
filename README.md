@@ -2,7 +2,7 @@
 
 一个**纯前端、零依赖、单文件**的修仙宗门经营模拟器：开一间山门，招弟子、盖房子、派差事、路上撞见三选一事件，靠挂机涨修为，最后收山看结局。
 
-> **打开即玩**：双击 `index.html`，或直接访问在线演示 👉 https://__USER__.github.io/pomen-sect-simulator/
+> **打开即玩**：双击 `index.html`，或直接访问在线演示 👉 https://Zyy-dev55.github.io/pomen-sect-simulator/
 >
 > 不联网、不安装、不登录、不加载任何外部图片或脚本 —— 全部画面都是代码画出来的。
 
