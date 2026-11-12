@@ -15,8 +15,10 @@
 网吧有还原卡会清空进度，所以设置面板里加了「导出存档文件 / 导入存档文件 /
 复制存档码 / 清空本机记录」，下机前把进度带走，换机接着玩。
 
-仓库里还有：完整小程序工程 sectgame/miniprogram/、两个历史版本、9 套回归测试
-（824 项断言）、L0~L6 分层排障自检、GitHub Actions CI、项目描述 PROJECT.md、
-断言规范 TESTING.md、排障手册 TROUBLESHOOTING.md。
+本仓库只收录网页离线版：index.html 一个文件即可运行，所有画面由代码绘制，
+不加载任何外部图片或脚本。
 
-详见仓库 README.md 与 docs/PROJECT.md。
+完整工程另含微信小程序端（miniprogram/）、两个历史版本与 9 套回归测试
+（824 项断言），不随本仓库公开。
+
+详见 README.md 与 docs/网吧离线包操作流程.txt。
