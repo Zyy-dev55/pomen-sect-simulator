@@ -1,0 +1,11 @@
+﻿破山门 · 网吧离线包 校验信息
+生成时间：2026/11/12 09:16:04
+
+index.html
+  字节数：223838
+  SHA256：aaf239e0658d91e7680e989af0cdc2271bbb7e26b5b918b08ada4dbe26177d6e
+
+核对方法（Windows PowerShell）：
+  Get-FileHash .\index.html -Algorithm SHA256
+
+内容不符请重新下载 / 重新上传；ZIP 内所有文件在打包时已做 CRC32 自检。

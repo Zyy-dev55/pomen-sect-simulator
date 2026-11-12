@@ -1,0 +1,4013 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>破山门 · 宗门模拟器</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --ink:#2b3a33; --sub:#6d7d72; --sea:#1d635c; --sea2:#2e8a78; --jade:#3d9a7c;
+  --gold:#d8a544; --gold2:#a9701f; --paper:#fbf6e7; --paper2:#f1ead6;
+  --line:#d9c9a2; --red:#c4553c; --blue:#3f86b0; --purple:#8e68b4; --green:#3d8f6b;
+}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:#173f3c;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:12px;overflow:hidden}
+.serif{font-family:"STKaiti","KaiTi","Songti SC","SimSun",serif}
+.phone{width:430px;max-width:100%;height:min(932px,calc(100vh - 24px));position:relative;overflow:hidden;
+  border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.4);border:1px solid #2b6b61;isolation:isolate}
+
+/* ---------- 背景：青绿水墨 ---------- */
+.sky{position:absolute;inset:0;z-index:0;
+  background:linear-gradient(180deg,#1e5f59 0%,#2b7d70 7%,#75bfa8 20%,#d9ecce 38%,#f3f2d9 54%,#dceccb 68%,#a9dcc1 82%,#5aae99 100%)}
+.sky .mist{position:absolute;left:-10%;right:-10%;height:44%;top:34%;
+  background:radial-gradient(ellipse at 30% 40%,rgba(255,250,220,.85),rgba(255,250,220,0) 62%),
+             radial-gradient(ellipse at 76% 60%,rgba(255,248,220,.72),rgba(255,248,220,0) 58%);filter:blur(6px)}
+.sky svg.mt{position:absolute;left:0;right:0;width:100%;height:100%;opacity:.55}
+.sky .cloud{position:absolute;bottom:0;left:0;right:0;height:34%;
+  background:radial-gradient(ellipse at 15% 90%,rgba(255,255,255,.55),transparent 60%),
+             radial-gradient(ellipse at 82% 78%,rgba(255,255,255,.48),transparent 62%),
+             linear-gradient(180deg,transparent,rgba(76,166,143,.5));filter:blur(3px)}
+.sky .glow{position:absolute;top:28%;left:50%;width:300px;height:300px;transform:translateX(-50%);
+  background:radial-gradient(circle,rgba(255,247,205,.7),transparent 68%)}
+
+/* ---------- 顶部状态 ---------- */
+.top{position:absolute;top:0;left:0;right:0;z-index:6;padding:9px 11px 0}
+.top .tr{display:flex;align-items:center;gap:7px;height:60px}
+.ava{width:58px;height:58px;border-radius:50%;border:2px solid #14574f;background:#cde9d5;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(10,50,45,.3),inset 0 0 0 3px rgba(255,255,255,.35);overflow:hidden;position:relative}
+.ava svg{width:100%;height:100%;display:block}
+.ava .gear{position:absolute;left:-3px;bottom:-3px;width:19px;height:19px;border-radius:50%;background:#2d5d55;
+  border:2px solid #e9f3da;color:#fff;font-size:10px;text-align:center;line-height:15px}
+.who{flex:1;min-width:0;padding-top:2px}
+.who .nm{font-size:13px;font-weight:800;color:#eef8e6;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 3px rgba(0,40,30,.75)}
+.who .sub{font-size:10px;color:#cbe6d3;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 3px rgba(0,40,30,.75)}
+.who .sub em{font-style:normal;color:#ffdaa2}
+.cash{display:flex;align-items:center;gap:5px;margin-left:auto}
+.cash .pill{display:flex;align-items:center;gap:3px;height:20px;min-width:52px;border-radius:12px;
+  background:linear-gradient(180deg,#1c6f5d,#0f5449);border:1px solid #b7d6a4;padding:0 7px;color:#f4f7df;font-size:11px;font-weight:700}
+.cash .pill.blue{background:linear-gradient(180deg,#2f7c9e,#215d80);border-color:#a9cfe2}
+.dot-g{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#d7f58a,#5aa343);border:1px solid #e7f5c2}
+.dot-b{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#bfeaff,#2f8bc4);border:1px solid #d6f0ff}
+.dot-p{width:13px;height:13px;border-radius:3px;transform:rotate(45deg);background:linear-gradient(135deg,#d4a4ea,#8751ad);border:1px solid #edd8f7}
+.caps{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin-top:-2px;margin-right:2px;height:20px}
+.caps .cap{width:74px;height:20px;border-radius:12px;background:rgba(255,255,255,.32);border:1px solid rgba(255,255,255,.5);
+  display:flex;align-items:center;justify-content:space-around;color:#fff;font-size:11px;letter-spacing:2px}
+.caps .cap i{width:13px;height:13px;border-radius:50%;border:1.5px solid #fff;display:block;position:relative}
+.caps .cap i::after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:#fff;top:2.5px;left:2.5px}
+.hud2{display:flex;align-items:center;gap:7px;margin-top:3px}
+.pw{width:124px;height:21px;border-radius:11px;border:1px solid #9d792f;position:relative;overflow:hidden;
+  background:linear-gradient(180deg,#e6c063,#b3822e);box-shadow:inset 0 1px 2px rgba(255,255,255,.5)}
+.pw b{position:absolute;inset:0;display:flex;align-items:center;gap:3px;padding-left:22px;color:#4a3110;font-size:11px;font-weight:800}
+.pw .ico{position:absolute;left:2px;top:1px;width:18px;height:18px;border-radius:50%;background:#f7de91;border:1px solid #8a6020}
+.qbtns{margin-left:auto;display:flex;gap:7px}
+.qbtn{width:39px;height:39px;border-radius:11px;background:rgba(252,247,229,.9);border:1px solid #b9a977;
+  box-shadow:0 2px 5px rgba(20,60,50,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#57503a;font-size:9px;position:relative;cursor:pointer;line-height:1.15}
+.qbtn .g{font-size:16px;font-weight:800;color:#3d6c5e}
+.qbtn .dot{position:absolute;right:-2px;top:-2px;width:8px;height:8px;border-radius:50%;background:#e2513c;border:1px solid #fff}
+
+/* ---------- 主场景 ---------- */
+.stage{position:absolute;left:0;right:0;top:118px;bottom:92px;z-index:3}
+.hero{position:absolute;top:47%;left:50%;transform:translate(-50%,-50%);text-align:center;cursor:pointer;width:170px}
+.hero .ring{width:92px;height:92px;margin:0 auto;position:relative;border-radius:50%;
+  background:radial-gradient(circle,#e8f7e2,#b8e2c9);border:3px solid #17574e;
+  box-shadow:0 0 0 7px rgba(255,255,255,.35),0 0 24px 8px rgba(255,246,190,.55),0 8px 18px rgba(20,70,60,.25);overflow:visible}
+.hero .ring svg{width:100%;height:100%;border-radius:50%;display:block}
+.hero .ring .leaf{position:absolute;width:20px;height:12px;background:linear-gradient(90deg,#7cc47a,#3d8c62);border-radius:0 90% 0 90%}
+.hero .ring .leaf.l{left:-14px;top:46%;transform:rotate(-18deg)}
+.hero .ring .leaf.r{right:-14px;top:46%;transform:rotate(160deg)}
+.hero .rlm{margin-top:9px;font-size:14px;font-weight:800;color:#2c8e68;text-shadow:0 1px 0 #fff,0 0 8px #eaffea;letter-spacing:1px}
+.hero .pw2{font-size:10px;color:#3e7361;margin-top:2px;text-shadow:0 1px 0 #fff}
+.float{position:absolute;left:50%;top:6%;font-size:12px;font-weight:800;color:#2e8766;pointer-events:none;
+  animation:up 3.2s linear infinite;opacity:0;text-shadow:0 1px 2px #fff}
+.float:nth-child(2){animation-delay:1.1s;left:36%}.float:nth-child(3){animation-delay:2.2s;left:64%}
+@keyframes up{0%{opacity:0;transform:translateY(14px)}20%{opacity:.9}100%{opacity:0;transform:translateY(-64px)}}
+.stage .bird{position:absolute;top:16%;left:18%;color:rgba(40,90,78,.35);font-size:16px;letter-spacing:10px}
+.stage .lamp{position:absolute;bottom:12%;left:8%;width:16px;height:34px;background:rgba(50,95,78,.25);border-radius:3px 3px 1px 1px}
+.stage .lamp::after{content:"";position:absolute;top:-8px;left:-6px;width:28px;height:9px;background:rgba(50,95,78,.3);border-radius:3px}
+.stage .stone{position:absolute;bottom:6%;right:14%;width:64px;height:26px;border-radius:50% 50% 6px 6px;background:rgba(60,105,88,.22)}
+
+/* ---------- 侧边悬浮 ---------- */
+.side{position:absolute;z-index:5;display:flex;gap:8px}
+.side.l{left:10px;bottom:172px;flex-direction:column}
+.side.r{right:10px;bottom:110px;flex-direction:row;align-items:flex-end}
+.cbtn{width:46px;height:46px;border-radius:50%;background:rgba(238,248,231,.86);border:2px solid #3b8b73;
+  box-shadow:0 3px 8px rgba(20,70,55,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#2d6c58;cursor:pointer;position:relative}
+.cbtn .g{font-size:17px;font-weight:800;line-height:1}
+.cbtn .t{font-size:8px;margin-top:2px;white-space:nowrap}
+.cbtn .red{position:absolute;right:-2px;top:-2px;width:9px;height:9px;border-radius:50%;background:#e04b34;border:1px solid #fff}
+.cbtn.sq{border-radius:12px;background:rgba(30,80,70,.72);border-color:#8ab8a0;color:#eaf6e8}
+.cbtn.sq .g{font-size:14px}.cbtn.sq .t{color:#cfe8d6}
+.rlabel{display:flex;gap:6px;position:absolute;bottom:-2px;right:0;font-size:9px;color:#e9f6e9;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.quest{position:absolute;left:10px;bottom:104px;z-index:5;width:176px;height:38px;border-radius:19px;
+  background:linear-gradient(180deg,rgba(255,250,232,.94),rgba(238,226,196,.94));border:1px solid #c8ad76;
+  display:flex;align-items:center;gap:6px;padding:0 9px;box-shadow:0 2px 6px rgba(20,70,55,.2)}
+.quest .qi{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#e8d28a,#b8943f);border:1px solid #8a6a25;
+  display:flex;align-items:center;justify-content:center;font-size:13px;color:#5c4213;flex-shrink:0}
+.quest .qtx{flex:1;min-width:0}
+.quest .qt{font-size:10px;color:#5c4a2c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quest .qb{height:4px;border-radius:3px;background:#dfd2ae;margin-top:3px;overflow:hidden}
+.quest .qb i{display:block;height:100%;background:linear-gradient(90deg,#e2b34e,#c6693b)}
+.quest .qn{font-size:9px;color:#9a6b2c;font-weight:800}
+
+/* ---------- 底部导航 ---------- */
+.dock{position:absolute;left:0;right:0;bottom:0;height:90px;z-index:7;display:flex;align-items:flex-end;
+  justify-content:space-around;padding:0 6px 8px;
+  background:linear-gradient(180deg,rgba(20,88,78,0) 0%,rgba(17,84,76,.55) 28%,#12564e 62%,#0e4a45 100%)}
+.dock::before{content:"";position:absolute;top:26px;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#7bbf9b,transparent);opacity:.6}
+.dock .it{width:60px;text-align:center;color:#e7f4e7;font-size:10px;cursor:pointer;position:relative;padding-bottom:2px}
+.dock .it .ic{width:34px;height:34px;margin:0 auto 2px;border-radius:50%;background:linear-gradient(180deg,#eaf5dc,#b9d9bd);
+  border:2px solid #7bbf9b;display:flex;align-items:center;justify-content:center;color:#2b6656;font-size:15px;font-weight:800;
+  box-shadow:0 2px 5px rgba(0,0,0,.2)}
+.dock .it .ic.ribbon{border-radius:6px;background:linear-gradient(180deg,#fbf4dc,#e2d6ac)}
+.dock .it.on .ic{box-shadow:0 0 0 2px #f4d483,0 2px 8px rgba(244,212,131,.6)}
+.dock .big{width:88px;height:88px;margin-top:-36px;border-radius:50%;position:relative;cursor:pointer;
+  background:radial-gradient(circle at 50% 35%,#ffe6a0,#d59a35 70%,#9a681f);border:3px solid #f5d98d;
+  box-shadow:0 0 0 4px rgba(20,80,70,.6),0 6px 16px rgba(0,0,0,.35)}
+.dock .big .in{position:absolute;inset:6px;border-radius:50%;overflow:hidden;border:2px solid #8a5d1d;background:#e9f2d9}
+.dock .big .in svg{width:100%;height:100%}
+.dock .big .lb{position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);white-space:nowrap;
+  background:#33424a;color:#fff;border-radius:9px;padding:1px 7px;font-size:9px;border:1px solid #c9d5d8}
+.dock .big .lb b{color:#d7a6f0}
+.dock .big:active{transform:scale(.95)}
+
+/* ---------- 遮罩 / 弹层 ---------- */
+.shade{position:absolute;inset:0;z-index:20;background:rgba(22,36,31,.62);display:none;
+  backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px)}
+.shade.on{display:block}
+.modal{position:absolute;inset:0;z-index:21;display:none;align-items:center;justify-content:center;padding:14px 20px;pointer-events:none}
+.modal.on{display:flex}
+.modal>*{pointer-events:auto;width:100%;max-height:90%;overflow-y:auto;scrollbar-width:thin}
+.mwrap{display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+.modal::-webkit-scrollbar,.modal>div::-webkit-scrollbar{width:4px}
+.modal>div::-webkit-scrollbar-thumb{background:#c9b98f;border-radius:4px}
+.card{background:#fbf6e7;border:2px solid #c9b284;border-radius:12px;box-shadow:0 16px 44px rgba(20,25,15,.4);
+  animation:pop .22s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.xclose{width:42px;height:42px;margin:14px auto 2px;transform:rotate(45deg);border-radius:9px;
+  background:linear-gradient(135deg,#efa45c,#cf4f38);border:2px solid #fff1d8;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 5px 14px rgba(0,0,0,.3)}
+.xclose b{transform:rotate(-45deg);color:#fff;font-size:24px;font-weight:400;line-height:1}
+
+/* 事件金卡 */
+.ev{border:3px solid #e0b15a;background:linear-gradient(180deg,#fff9e9,#fdf3dc);border-radius:10px;
+  box-shadow:0 0 0 2px #8b5b23,inset 0 0 0 1px #fff,0 18px 46px rgba(0,0,0,.4);overflow:hidden}
+.ev .cap{height:64px;position:relative;background:linear-gradient(180deg,#eda250,#c9752f);
+  border-bottom:2px solid #a86524;overflow:hidden}
+.ev .cap .sun{position:absolute;left:50%;top:8px;width:70px;height:70px;transform:translateX(-50%);border-radius:50%;
+  background:radial-gradient(circle,#ffedbb,#f5c67b);opacity:.55}
+.ev .cap svg{position:absolute;bottom:0;left:0;width:100%;height:36px}
+.ev .cap .ttl{position:absolute;left:50%;top:7px;transform:translateX(-50%);min-width:76px;height:34px;
+  border-radius:18px;background:linear-gradient(180deg,#fff0c4,#eec982);border:2px solid #9c6120;
+  color:#7a4313;font-size:17px;font-weight:800;letter-spacing:3px;text-align:center;line-height:30px;
+  box-shadow:0 2px 5px rgba(90,50,10,.3);z-index:2;padding:0 10px}
+.ev .eye{position:absolute;right:9px;top:7px;width:28px;height:28px;border-radius:50%;background:#fff8ea;
+  border:2px solid #d0a25c;display:flex;align-items:center;justify-content:center;font-size:15px;color:#7a5a2c;cursor:pointer;z-index:3}
+.ev .pair{display:flex;justify-content:center;gap:26px;padding:14px 0 6px}
+.ev .pair .one{text-align:center;width:78px}
+.ev .pair .one .ph{width:54px;height:54px;margin:0 auto;border-radius:50%;overflow:hidden;border:2px solid #c9ac6e;background:#e7f2e0}
+.ev .pair .one .ph svg{width:100%;height:100%}
+.ev .pair .one .n{font-size:12px;color:#4b3b28;margin-top:4px;font-weight:700;white-space:nowrap}
+.ev .pair .one .r{font-size:10px;color:#8b6b42}
+.ev .body{padding:8px 18px 12px;font-size:14px;line-height:1.95;color:#5b4028;font-family:"STKaiti","KaiTi","Songti SC",serif}
+.ev .opt{display:block;width:calc(100% - 36px);margin:9px 18px;height:44px;border-radius:22px;cursor:pointer;
+  background:linear-gradient(180deg,#fffdf6,#f5ebd5);border:1px solid #d8c095;color:#4d3c25;font-size:14px;
+  font-family:"STKaiti","KaiTi","Songti SC",serif;letter-spacing:1px;box-shadow:0 2px 3px rgba(140,100,50,.15)}
+.ev .opt:active{background:#f3e2bf;border-color:#b98a45}
+.ev .opt small{display:block;font-size:9px;color:#a08456;letter-spacing:0}
+.ev .foot{text-align:center;font-size:10px;color:#9a7c4d;padding:2px 0 12px}
+
+/* 青绿面板 */
+.dp{background:linear-gradient(180deg,#f8f6e8,#f2eeda);border:2px solid #c3b287;border-radius:10px;overflow:hidden;
+  box-shadow:0 16px 40px rgba(20,30,20,.4)}
+.dp .ttl{height:38px;background:linear-gradient(180deg,#59a991,#2c7d6b);color:#fff9e7;text-align:center;
+  line-height:38px;font-size:17px;letter-spacing:3px;font-family:"STKaiti","KaiTi","Songti SC",serif;font-weight:700;
+  border-bottom:2px solid #1e6558;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.dp .inner{padding:10px 11px 12px}
+.secbar{height:26px;margin:4px 0 8px;position:relative;background:linear-gradient(180deg,#63ad98,#3b8a77);
+  border-radius:4px;color:#fffdf0;text-align:center;line-height:26px;font-size:13px;letter-spacing:2px;
+  font-family:"STKaiti","KaiTi",serif;box-shadow:inset 0 1px 2px rgba(255,255,255,.25)}
+.secbar::before,.secbar::after{content:"~";position:absolute;top:0;color:#dff0e3;font-size:15px;opacity:.8}
+.secbar::before{left:8px}.secbar::after{right:8px}
+.secbar .qm{position:absolute;right:8px;top:1px;width:19px;height:19px;border-radius:50%;border:1px solid #fff;
+  font-size:11px;line-height:18px;background:rgba(255,255,255,.18)}
+.secbar .qm+::after{display:none}
+.mini{font-size:10px;color:#826f52;line-height:1.6}
+.hr{height:1px;background:#ded2b6;margin:10px 0}
+
+/* 存档 / 网吧换机续玩 */
+.sectttl{font-size:12px;font-weight:800;letter-spacing:3px;color:#1d6458;text-align:center;margin:2px 0 7px}
+.warnbar{background:#fff0d8;border:1px dashed #c99a52;border-radius:8px;padding:8px 9px;font-size:10px;
+  color:#7a4a17;line-height:1.65;margin-bottom:8px}
+.warnbar b{color:#a04b18}
+.savecode{display:block;width:100%;height:62px;box-sizing:border-box;border:1px solid #cbb88b;border-radius:7px;
+  background:#fffdf5;color:#4b3a20;font-size:10px;line-height:1.4;padding:6px 8px;resize:vertical;
+  font-family:Consolas,"Courier New",monospace;word-break:break-all}
+.filebtn{display:block!important;text-align:center;position:relative;overflow:hidden;cursor:pointer;padding:8px 4px!important}
+.filebtn .fileinput{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+
+/* 弟子属性 */
+.dtop{display:flex;gap:9px;align-items:center;margin-bottom:8px}
+.dtop .ph{width:64px;height:64px;border-radius:50%;border:3px solid #1d6458;background:#dff0df;overflow:hidden;flex-shrink:0;
+  box-shadow:0 0 0 4px rgba(255,255,255,.6)}
+.dtop .ph svg{width:100%;height:100%}
+.dtop .l{flex:1;min-width:0}
+.dtop .pwb{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(180deg,#e9c667,#bb8a2f);
+  border:1px solid #8a6220;border-radius:10px;padding:1px 9px;color:#4a3110;font-size:14px;font-weight:800}
+.dtop .rate{font-size:10px;color:#2f7c9a;margin-top:4px;font-weight:700}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.cell{background:#fffdf3;border:1px solid #e6dcc0;border-radius:6px;padding:5px 2px;text-align:center}
+.cell .k{font-size:10px;color:#8a7a60}
+.cell .v{font-size:13px;font-weight:800;color:#2e6e57;line-height:1.4}
+.cell .v.b{color:#3f7ba0}.cell .v.r{color:#b3543c}
+.qiline{display:flex;align-items:center;gap:6px;font-size:10px;color:#6c5c42;margin:5px 0}
+.qiline .bar{flex:1;height:9px;border-radius:5px;background:#e3d7b8;overflow:hidden;position:relative}
+.qiline .bar i{display:block;height:100%;background:linear-gradient(90deg,#e8ad43,#d06a37)}
+.qiline .bar span{position:absolute;inset:0;text-align:center;font-size:8px;color:#4b3a20;line-height:9px}
+.qiline .plus{color:#2e7f62;font-weight:800;white-space:nowrap}
+.radar{position:relative;height:158px;display:flex;align-items:center;justify-content:center}
+.radar svg{width:190px;height:158px}
+.radar .lbs{position:absolute;inset:0;pointer-events:none}
+.radar .lb{position:absolute;font-size:10px;color:#9a6a2c;white-space:nowrap}
+.radar .lb b{color:#2e7f62}
+.tags{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.tagchip{border-radius:4px;padding:3px 8px;font-size:11px;color:#fff;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.tagchip.gray{background:#7d817c}
+.eq{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.slot{aspect-ratio:1/1;border-radius:9px;background:linear-gradient(160deg,#5c5f5b,#40443f);border:1px solid #2f332f;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;color:#d8d8cf;cursor:pointer;position:relative;
+  box-shadow:inset 0 1px 3px rgba(255,255,255,.12)}
+.slot .g{font-size:20px;line-height:1}.slot .n{font-size:9px;margin-top:3px}
+.slot.has{background:linear-gradient(160deg,#e9d6a4,#c9a25c);border-color:#8a6a2d;color:#4a3413}
+.slot.has .g{color:#7a4d1b}.slot .lv{position:absolute;right:3px;top:2px;font-size:9px;color:#f7e6b3;font-weight:800}
+.slot.has .lv{color:#7a3d1a}
+.subtabs{display:flex;gap:0;border-top:1px solid #cfc19d;background:#eae3cd}
+.subtabs div{flex:1;text-align:center;padding:8px 2px;font-size:12px;color:#5b6b62;cursor:pointer}
+.subtabs div.on{background:linear-gradient(180deg,#e9c76e,#cf9f3f);color:#4a3110;font-weight:800;border-radius:5px 5px 0 0}
+.jlog{margin-bottom:8px;background:#fffdf1;border:1px solid #e2d8bc;border-radius:6px;padding:8px 9px}
+.jlog .dt{display:inline-block;background:linear-gradient(180deg,#7fb9a2,#4a947c);color:#fff;border-radius:4px;
+  font-size:10px;padding:2px 8px;margin-bottom:5px}
+.jlog .tx{font-size:12px;line-height:1.85;color:#4b4638;font-family:"STKaiti","KaiTi",serif}
+.jlog .tx .name{color:#3c86b4;font-weight:700}.jlog .tx .good{color:#2f8a5f;font-weight:700}
+.jlog .tx .bad{color:#bb4a36;font-weight:700}.jlog .tx .egg{color:#c08b25;font-weight:700}
+.jlog .tx .tag{color:#b06a2d;font-weight:700}
+.kv{display:flex;justify-content:space-between;font-size:11px;padding:5px 2px;border-bottom:1px dashed #ddd0b0}
+.kv span{color:#8a795d}.kv b{color:#3c4a3f}
+.listrow{display:flex;align-items:center;gap:8px;background:#fffdf2;border:1px solid #e3d7b8;border-radius:7px;
+  padding:7px 9px;margin-bottom:6px;cursor:pointer}
+.listrow .g{flex:1;min-width:0}
+.listrow .nm{font-size:12px;font-weight:800;color:#3c4a3f}
+.listrow .ds{font-size:10px;color:#8a795d;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{border:1px solid #b99a5f;background:linear-gradient(180deg,#fff8e4,#ead9b2);color:#59442a;border-radius:16px;
+  padding:5px 12px;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn:active{transform:scale(.96)}
+.btn.pri{background:linear-gradient(180deg,#5ba98f,#2e7e6b);border-color:#1e6555;color:#fff;font-weight:700}
+.btn.gold{background:linear-gradient(180deg,#eec46a,#c18c34);border-color:#8a6220;color:#4a3110;font-weight:800}
+.btn[disabled]{opacity:.42;cursor:not-allowed}
+.btn.sm{padding:4px 9px;font-size:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.pill2{display:inline-block;border-radius:5px;padding:2px 7px;font-size:10px;color:#fff;font-weight:700}
+
+/* 签到 */
+.signwrap{background:linear-gradient(180deg,#fbf6e3,#f3ead1);border:2px solid #cab98d;border-radius:10px;overflow:hidden}
+.signwrap .ttl{height:38px;background:linear-gradient(180deg,#66b79c,#2f8a72);color:#fff;text-align:center;line-height:38px;
+  font-size:19px;letter-spacing:4px;font-family:"STKaiti","KaiTi",serif;border-bottom:2px solid #1f6d5b}
+.signwrap .in{padding:11px}
+.signgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.sday{background:linear-gradient(180deg,#e8f3eb,#f9f5e4);border:1px solid #c9d7bd;border-radius:6px;padding:5px;text-align:center}
+.sday .dh{font-size:10px;color:#4b806d;font-weight:700;margin-bottom:4px}
+.sday .ii{display:flex;justify-content:center;gap:5px;align-items:center}
+.sday .ii .ic{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.3);position:relative}
+.sday .ii .ic.green{background:linear-gradient(150deg,#8ecb62,#4b9a46);border:1px solid #3d7a38}
+.sday .ii .ic.blue{background:linear-gradient(150deg,#8bcbf0,#3b83b6);border:1px solid #2b6590}
+.sday .ii .ic.purple{background:linear-gradient(150deg,#c69ce4,#8251ac);border:1px solid #673f8c}
+.sday .ii .ic small{position:absolute;bottom:-1px;right:1px;font-size:8px}
+.sday .ii .ic .ok{position:absolute;inset:0;background:rgba(40,120,70,.62);display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:18px;font-weight:800}
+.sday.seven{grid-column:span 3;background:linear-gradient(180deg,#f6dba6,#f7ecd0);border-color:#d4a65a}
+.sday.seven .ii .ic{width:42px;height:42px}
+.signfoot{display:flex;align-items:center;justify-content:center;margin-top:11px;position:relative;height:34px}
+.signfoot .done{color:#3c9572;font-size:14px;font-weight:800;font-family:"STKaiti","KaiTi",serif;letter-spacing:2px}
+.signfoot .stamp{position:absolute;right:2px;width:34px;height:34px;border-radius:50%;border:2px solid #4a8e78;
+  color:#3c7d68;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;line-height:1.1;text-align:center}
+
+/* 排行 */
+.rankwrap{background:linear-gradient(180deg,#fdf4cf,#f7efd4);border:2px solid #d8bd7c;border-radius:10px;overflow:hidden;text-align:center}
+.rankwrap h2{font-size:25px;letter-spacing:6px;color:#7a4a17;font-family:"STKaiti","KaiTi",serif;margin:12px 0 3px;text-shadow:0 1px 0 #fff}
+.rankwrap .note{font-size:10px;color:#c26b3a;margin-bottom:10px}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:5px;padding:0 12px}
+.podium .p{width:31%;border:2px solid #d5a44e;border-radius:8px 8px 2px 2px;padding:6px 3px 8px;position:relative;
+  background:linear-gradient(180deg,#fffbe9,#f6e2ae);overflow:hidden}
+.podium .p.one{height:176px;border-color:#c9632e;background:linear-gradient(180deg,#fff3d0,#f2c67e)}
+.podium .p.two{height:160px}.podium .p.three{height:152px;border-color:#5f9fb5;background:linear-gradient(180deg,#f2fbfb,#c9e5ec)}
+.podium .p .rk{font-size:13px;font-weight:800;color:#9a6a25;font-family:"STKaiti","KaiTi",serif}
+.podium .p.one .rk{color:#c04a28}.podium .p.three .rk{color:#3a7c99}
+.podium .p .ph{width:44px;height:44px;margin:5px auto;border-radius:50%;border:2px solid #b98d4c;overflow:hidden;background:#e8f3e0}
+.podium .p .ph svg{width:100%;height:100%}
+.podium .p .nm{font-size:11px;color:#5c4a2c;line-height:1.3;height:28px;overflow:hidden}
+.podium .p .pw{display:inline-block;background:linear-gradient(180deg,#edc45f,#c38a2c);border-radius:9px;
+  padding:1px 7px;font-size:10px;color:#4b3110;font-weight:800;margin-top:2px}
+.podium .p .mul{font-size:9px;color:#3d8a68;margin-top:3px}
+.podium .crown{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:18px;color:#d4772d}
+.rlist{padding:8px 12px 4px}
+.rlist .row{display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,#fffdf1,#f5e9c8);
+  border:1px solid #ddc58d;border-radius:20px;padding:5px 10px;margin-bottom:6px}
+.rlist .row .no{width:20px;height:20px;border-radius:50%;background:#e9d49b;color:#8a6526;font-size:11px;font-weight:800;line-height:20px}
+.rlist .row .ph{width:30px;height:30px;border-radius:50%;border:1px solid #b9a06a;overflow:hidden;background:#e7f2e0}
+.rlist .row .ph svg{width:100%;height:100%}
+.rlist .row .nm{flex:1;text-align:left;font-size:11px;color:#5c4a2c}
+.rlist .row .pw{font-size:11px;font-weight:800;color:#b47a21}
+.mybar{display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,#e9b85a,#f5e0a3,#eec376);padding:7px 12px;text-align:left}
+.mybar .ph{width:34px;height:34px;border-radius:50%;border:2px solid #8a6a2d;overflow:hidden;background:#e7f2e0}
+.mybar .ph svg{width:100%;height:100%}
+.mybar .tx{flex:1;font-size:11px;color:#5c3f18}.mybar .tx b{display:block;font-size:12px}
+.mybar .pw{font-size:12px;font-weight:800;color:#a4521c}
+.rankfoot{background:#19685d;color:#eaf6e4;padding:8px 0 12px;position:relative}
+.rankfoot .t{font-size:14px;letter-spacing:2px;font-family:"STKaiti","KaiTi",serif}
+.rankfoot .ar{position:absolute;top:8px;font-size:16px;color:#a8d5bd}.rankfoot .ar.l{left:20px}.rankfoot .ar.r{right:20px}
+.rankfoot .dots{margin-top:6px;color:#a8d5bd;font-size:9px;letter-spacing:4px}
+
+/* 开局 / 通用表单 */
+.setup{padding:16px 14px;text-align:center;background:linear-gradient(180deg,#fff8e6,#f4e8cd)}
+.setup h2{font-size:26px;letter-spacing:8px;color:#7a4a17;font-family:"STKaiti","KaiTi",serif;margin-bottom:4px}
+.setup .lead{font-size:11px;color:#8a7452;line-height:1.7;margin-bottom:12px}
+.fld{font-size:11px;color:#7a6238;text-align:left;margin:9px 0 5px;font-weight:700}
+.inp{width:100%;border:1px solid #cbb88b;border-radius:7px;padding:8px 10px;font-size:14px;background:#fffdf5;color:#4b3a20;font-family:inherit}
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pk{text-align:left;background:#fffaf0;border:1px solid #dcc9a0;border-radius:7px;padding:7px 8px;cursor:pointer}
+.pk.on{border-color:#c07b32;background:#fcedd4;box-shadow:inset 0 0 0 1px #c07b32}
+.pk .t{font-size:12px;font-weight:800;color:#4b3a20}.pk .d{font-size:9.5px;color:#8a795d;line-height:1.45;margin-top:2px}
+.pick.one{grid-template-columns:1fr}
+.foot{display:flex;gap:8px;margin-top:12px}.foot .btn{flex:1;padding:9px}
+
+/* 结果 */
+.rst{text-align:center;padding:14px}
+.rst .big{font-size:26px;font-weight:800;letter-spacing:4px;margin:6px 0;font-family:"STKaiti","KaiTi",serif}
+.rst .sub{font-size:11px;color:#8a795d;margin-bottom:10px}
+.rst .ep{text-align:left;font-size:12px;line-height:1.9;background:#f6efe0;border-radius:8px;padding:10px 11px;margin-bottom:10px;font-family:"STKaiti","KaiTi",serif}
+.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.nums div{background:#f1e6cc;border-radius:7px;padding:7px 2px}
+.nums .v{font-size:15px;font-weight:800;color:#6b4a1c}.nums .k{font-size:9px;color:#8a795d}
+.pct{background:linear-gradient(135deg,#b8593b,#d89554);color:#fff;border-radius:9px;padding:11px;margin-bottom:9px}
+.pct .p{font-size:25px;font-weight:800}.pct .t{font-size:10px;opacity:.92}
+
+/* toast */
+.toast{position:absolute;left:50%;bottom:120px;transform:translateX(-50%);z-index:40;display:none;pointer-events:none;
+  background:rgba(28,45,38,.92);color:#fff8e6;font-size:11.5px;padding:8px 15px;border-radius:20px;max-width:86%;
+  text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.18)}
+.toast.on{display:block;animation:tin .18s}
+@keyframes tin{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+
+@media(max-width:560px){body{padding:0}.phone{width:100%;height:100vh;border-radius:0;border:0}}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="sky">
+    <div class="mist"></div>
+    <svg class="mt" viewBox="0 0 430 932" preserveAspectRatio="none" aria-hidden="true">
+      <path fill="#2e7c6b" opacity=".16" d="M0 292 L58 218 L96 258 L150 172 L196 236 L242 190 L310 262 L360 210 L430 286 L430 420 L0 420 Z"/>
+      <path fill="#2e7c6b" opacity=".12" d="M0 348 L70 280 L120 326 L176 252 L226 310 L286 258 L344 322 L430 268 L430 460 L0 460 Z"/>
+      <path fill="#3c8e74" opacity=".13" d="M0 700 Q90 640 180 690 T430 672 L430 932 L0 932 Z"/>
+      <path fill="#1f6e60" opacity=".10" d="M0 790 Q120 726 230 780 T430 752 L430 932 L0 932 Z"/>
+    </svg>
+    <div class="glow"></div>
+    <div class="cloud"></div>
+  </div>
+
+  <div class="top" id="top"></div>
+  <div class="stage" id="stage"></div>
+  <div class="side l" id="sideL"></div>
+  <div class="side r" id="sideR"></div>
+  <div class="quest" id="quest"></div>
+  <div class="dock" id="dock"></div>
+
+  <div class="shade" id="shade"></div>
+  <div class="modal" id="modal"></div>
+  <div class="toast" id="toast"></div>
+</div>
+<script>var __mods = {};
+function __def(n, f) { __mods[n] = { f: f, m: null }; }
+function __req(n) {
+  var m = __mods[n];
+  if (!m) throw new Error('missing module: ' + n);
+  if (m.m) return m.m;
+  var mod = { exports: {} }; m.m = mod.exports;
+  m.f(mod, mod.exports, __req); m.m = mod.exports; return m.m;
+}
+var wx = { setStorageSync: function(){}, getStorageSync: function(){ return ""; } };
+__def('sect-data', function (module, exports, __req) {
+/* 破山门 · 配置表
+ * 纯数据，零 DOM，小程序端与网页端共用。
+ * 所有名称、文案、数值均为本项目自写。
+ */
+var D = {};
+
+D.NAME = '破山门';
+D.SAVE_KEY = 'poshanmen_save_v2';
+D.VER = 2;
+
+/* ---------------- 境界 ---------------- */
+D.REALMS = [
+  { n: '练气', need: 0,     power: 12,  life: 65,  up: 0.88 },
+  { n: '筑基', need: 130,   power: 34,  life: 90,  up: 0.82 },
+  { n: '金丹', need: 420,   power: 88,  life: 130, up: 0.74 },
+  { n: '元婴', need: 1050,  power: 210, life: 190, up: 0.66 },
+  { n: '化神', need: 2300,  power: 470, life: 280, up: 0.58 },
+  { n: '炼虚', need: 4700,  power: 980, life: 400, up: 0.50 },
+  { n: '合体', need: 8800,  power: 1950, life: 560, up: 0.42 },
+  { n: '大乘', need: 15500, power: 3800, life: 760, up: 0.34 },
+  { n: '渡劫', need: 26500, power: 7200, life: 1000, up: 0.26 },
+  { n: '飞升', need: 45000, power: 14000, life: 9999, up: 0 }
+];
+
+/* ---------------- 五行灵根 ---------------- */
+/* win: 克制谁；适配的岗位在 TASKS / BUILDINGS 里判定 */
+D.ROOTS = [
+  { k: 'jin', n: '金', c: '#c9a227', win: 'mu', job: 'forge', tip: '打铁、打架都硬' },
+  { k: 'mu',  n: '木', c: '#5f9e52', win: 'tu', job: 'field', tip: '种啥长啥，还会救人' },
+  { k: 'shui',n: '水', c: '#4e8fb5', win: 'huo', job: 'alchemy', tip: '炼丹一绝，性子滑' },
+  { k: 'huo', n: '火', c: '#c85a3c', win: 'jin', job: 'arena', tip: '爆发高，容易闯祸' },
+  { k: 'tu',  n: '土', c: '#a07a4c', win: 'shui', job: 'ward', tip: '扛揍，守山门最好' },
+  { k: 'lei', n: '雷', c: '#8a6fc4', win: 'shui', job: 'arena', tip: '罕见，专治花里胡哨' },
+  { k: 'bing',n: '冰', c: '#6fa9b8', win: 'huo', job: 'library', tip: '罕见，心静得吓人' }
+];
+
+/* ---------------- 资质 ---------------- */
+D.QUALITY = [
+  { k: 'fan',  n: '凡资', c: '#8d887c', mul: 0.65, w: 30, star: 1 },
+  { k: 'liang',n: '良资', c: '#5f9668', mul: 0.95, w: 27, star: 2 },
+  { k: 'you',  n: '优资', c: '#4a86b8', mul: 1.35, w: 20, star: 3 },
+  { k: 'jue',  n: '绝资', c: '#9a63bb', mul: 1.95, w: 13, star: 4 },
+  { k: 'jiao', n: '天骄', c: '#d0842c', mul: 2.9,  w: 8,  star: 5 },
+  { k: 'yao',  n: '妖孽', c: '#c8453a', mul: 4.4,  w: 2,  star: 6 }
+];
+
+/* ---------------- 性格 ---------------- */
+D.TRAITS = [
+  { k: 'wen',   n: '沉稳', d: '不容易出事，突破稳',       grow: 1.00, loyalty: 2,  risk: 0.6 },
+  { k: 'mang',  n: '莽',   d: '战力高，爱闯祸',           grow: 1.05, loyalty: 0,  risk: 1.8 },
+  { k: 'hua',   n: '滑头', d: '做任务赚得多，也可能卷钱跑', grow: 0.95, loyalty: -3, risk: 1.3 },
+  { k: 'gu',    n: '孤僻', d: '闭关效率高，不爱配合',     grow: 1.20, loyalty: -1, risk: 0.7 },
+  { k: 're',    n: '热心', d: '带新人，全宗门都沾光',     grow: 1.02, loyalty: 3,  risk: 0.8 },
+  { k: 'ao',    n: '傲',   d: '天资越高越猛，低资容易摆烂', grow: 1.10, loyalty: -2, risk: 1.2 },
+  { k: 'chi',   n: '痴',   d: '认准一件事就往死里钻',     grow: 1.15, loyalty: 1,  risk: 0.9 },
+  { k: 'lan',   n: '懒',   d: '修炼慢，但运气奇好',       grow: 0.80, loyalty: 1,  risk: 0.7 }
+];
+
+/* ---------------- 隐藏天赋（决定爽点差异） ---------------- */
+D.TALENTS = [
+  { k: 'dan',    n: '不点火',     d: '炼丹不耗药材，还多出一炉' },
+  { k: 'ai',     n: '挨打就涨',   d: '每受一次伤，修为猛涨一截' },
+  { k: 'kejian', n: '专克剑修',   d: '对剑修对手战力翻倍' },
+  { k: 'yun',    n: '走哪捡哪',   d: '做任务额外捞一笔灵石' },
+  { k: 'tou',    n: '手不太干净', d: '每年顺点宗门东西，也可能顺回宝物' },
+  { k: 'wu',     n: '一听就懂',   d: '讲道效果翻倍' },
+  { k: 'shou',   n: '命硬',       d: '重伤、渡劫都死不了' },
+  { k: 'fan',    n: '大器晚成',   d: '四十岁后修炼速度翻三倍' },
+  { k: 'zao',    n: '少年得志',   d: '前二十年年年突破' },
+  { k: 'shuang', n: '双修奇才',   d: '结侣后两人一起涨修为' },
+  { k: 'zhen',   n: '阵痴',       d: '护山大阵等级视作高两级' },
+  { k: 'ku',     n: '苦修',       d: '闭关时修为翻三倍，但不接任务' },
+  { k: 'zui',    n: '一杯就倒',   d: '喝酒误事，偶尔悟出绝学' },
+  { k: 'mao',    n: '猫缘',       d: '秘境里总能碰见好事' },
+  { k: 'chou',   n: '人嫌狗厌',   d: '宗门声望涨得慢，但没人敢来踢馆' },
+  { k: 'suan',   n: '会算账',     d: '宗门每年支出减两成' },
+  { k: 'du',     n: '百毒不侵',   d: '妖兽潮、毒瘴秘境全免疫' },
+  { k: 'jian',   n: '一剑',       d: '战报里必定一招定胜负' },
+  { k: 'hua2',   n: '会来事',     d: '别宗来犯时常能谈和，白拿好处' },
+  { k: 'pao',    n: '跑得快',     d: '打输也不会死，最多丢面子' },
+  { k: 'cang',   n: '藏得深',     d: '资质看着低，三十岁后暴露真本事' },
+  { k: 'fu',     n: '福星',       d: '在宗门里，全宗突破率提高' },
+  { k: 'ni',     n: '逆骨',       d: '境界越高越不服管，可能自己开宗' },
+  { k: 'meng',   n: '梦里学艺',   d: '睡觉也在涨修为' }
+];
+
+/* ---------------- 姓名 ---------------- */
+D.SURNAMES = ('沈 陆 顾 苏 谢 温 白 江 许 阮 傅 宋 褚 秦 燕 洛 岑 裴 纪 陶 孟 池 商 崔 卞 邵 闻 邢 虞 施 窦 霍 卓 关 桑 桂 屠 靳 简 饶 奚 侯 柯 闵 席 倪 殷 毕 穆 康 伍 余 元 卜 顾 宁 仇 栾 甘 厉 祖 符 展').split(' ');
+D.GIVEN1 = ('云 舟 砚 尘 烬 昭 岚 岐 霜 泠 珩 澈 疏 晏 迟 朔 棠 灼 隅 岑 崖 珏 芦 荻 樾 霁 嵩 屹 燧 涣 榆 樾 箬 翎 屿 稷 笙 砚 诩 戈 骁 晏 樯 樽 骐 琮 濯 纾 侗 翀 沅 苒 珺 骞 舸 崚 澹 芃 昶 燊 彧 忻').split(' ');
+D.GIVEN2 = ('之 生 儿 子 卿 娘 哥 奴 官 娃 头 生 阿 小 老 大 三 七 九 十一').split(' ');
+
+/* ---------------- 宗门路数 ---------------- */
+D.PATHS = [
+  { k: 'zheng', n: '正道', icon: '正', c: '#3f7f6a',
+    d: '接委托、赚声望、别人愿意来投。声望涨得快，但要脸，很多脏活干不了。',
+    start: { stone: 260, herb: 18, ore: 10, scroll: 2, fame: 30 },
+    per: { fame: 1.35, stone: 0.9 }, tag: '名门' },
+  { k: 'mo', n: '魔道', icon: '魔', c: '#a33a3a',
+    d: '抢就完了。灵石来得猛、弟子战力高，但声望难涨，人人喊打，弟子也容易反水。',
+    start: { stone: 420, herb: 10, ore: 22, scroll: 1, fame: 0 },
+    per: { stone: 1.4, power: 1.25, fame: 0.6, loyalty: -2 }, tag: '巨擘' },
+  { k: 'zhong', n: '中立', icon: '中', c: '#6f7789',
+    d: '谁也不得罪，闷头发育。四平八稳，没有短板也没有白捡的便宜。',
+    start: { stone: 340, herb: 16, ore: 16, scroll: 3, fame: 12 },
+    per: { grow: 1.1 }, tag: '隐宗' },
+  { k: 'shang', n: '商道', icon: '商', c: '#b07a2c',
+    d: '把宗门开成铺子。丹药法器卖到脱销，灵石多到花不完，就是打架不太行。',
+    start: { stone: 560, herb: 26, ore: 8, scroll: 2, fame: 8 },
+    per: { stone: 1.7, trade: 1.6, power: 0.85 }, tag: '财主' }
+];
+
+/* ---------------- 开山长老 ---------------- */
+D.MASTERS = [
+  { k: 'jian', n: '剑修 · 独孤九', d: '弟子战力 +25%，但突破容易走火', per: { power: 1.25, up: -0.04 }, job: 'arena' },
+  { k: 'dan',  n: '丹修 · 药婆婆', d: '炼丹产出翻倍，弟子少伤病', per: { herb: 1.5, heal: 1.5, grow: 1.05 }, job: 'alchemy' },
+  { k: 'zhen', n: '阵修 · 墨先生', d: '聚灵阵与护山大阵各白送一级', per: { array: 1, ward: 1, grow: 1.1 }, job: 'ward' },
+  { k: 'fu',   n: '符修 · 一夜白', d: '每年多一张残卷，秘境里不容易翻车', per: { scroll: 1, secret: 1.3 }, job: 'library' }
+];
+
+/* ---------------- 道侣 ---------------- */
+D.PARTNERS = [
+  { k: 'yi',   n: '医修 · 阿芷', d: '弟子重伤能救回来，每年全宗回血', per: { heal: 2, life: 6 } },
+  { k: 'jian', n: '剑修 · 谢无回', d: '宗门战全队战力 +18%', per: { power: 1.18 } },
+  { k: 'shang',n: '商贾 · 钱三娘', d: '每年白得一笔灵石，买卖不亏', per: { stone: 90, trade: 1.4 } },
+  { k: 'san',  n: '散修 · 老瓢', d: '招募便宜一半，还总能招到怪才', per: { recruit: 0.5, talent: 1.6 } },
+  { k: 'none', n: '先不找', d: '一个人说了算，没人分东西', per: {} }
+];
+
+/* ---------------- 建筑 ---------------- */
+/* cost: 基础造价，随等级 ×1.65^lv；out: 每级年产出 */
+D.BUILDINGS = [
+  { k: 'hall',    n: '山门大殿', icon: '殿', cost: { stone: 220, ore: 12 }, max: 6,
+    d: '宗门脸面。每两级多 1 点年度行动力，也是升级其他建筑的上限。', out: { ap: 0.5 } },
+  { k: 'dorm',    n: '弟子寮',   icon: '寮', cost: { stone: 90,  ore: 4 },  max: 8,
+    d: '能住几个人。不盖这个，招到天骄也只能睡柴房。', out: { cap: 3 } },
+  { k: 'array',   n: '聚灵阵',   icon: '阵', cost: { stone: 160, ore: 14 }, max: 8,
+    d: '全宗门修炼速度 +12%/级。最实在的一笔投资。', out: { grow: 0.12 } },
+  { k: 'field',   n: '灵田',     icon: '田', cost: { stone: 80,  ore: 2 },  max: 8,
+    d: '每年产药材，丹房的米缸。', out: { herb: 7 } },
+  { k: 'mine',    n: '矿脉',     icon: '矿', cost: { stone: 110, ore: 0 },  max: 8,
+    d: '每年产矿石，盖房子炼器全靠它。', out: { ore: 5 } },
+  { k: 'arena',   n: '演武堂',   icon: '武', cost: { stone: 150, ore: 10 }, max: 8,
+    d: '弟子战力 +8%/级，宗门战前还能临时抱佛脚。', out: { power: 0.08 } },
+  { k: 'library', n: '藏经阁',   icon: '阁', cost: { stone: 200, ore: 16 }, max: 8,
+    d: '每年攒残卷，也提高翻出好功法的概率。', out: { scroll: 0.3 } },
+  { k: 'alchemy', n: '丹房',     icon: '丹', cost: { stone: 140, ore: 8 },  max: 8,
+    d: '解锁炼丹。等级越高，一炉出的丹越多。', out: { pill: 1 } },
+  { k: 'forge',   n: '器坊',     icon: '器', cost: { stone: 170, ore: 18 }, max: 8,
+    d: '解锁炼器，给弟子配法器。金灵根弟子在这儿特别猛。', out: { gear: 1 } },
+  { k: 'ward',    n: '护山大阵', icon: '护', cost: { stone: 190, ore: 20 }, max: 8,
+    d: '防守 +15%/级。外敌来犯时少死人、少丢东西。', out: { ward: 0.15 } },
+  { k: 'altar',   n: '论道台',   icon: '道', cost: { stone: 130, ore: 6 },  max: 8,
+    d: '每年涨声望，偶尔引来别宗高手进门。', out: { fame: 4 } }
+];
+D.BUILD_BY_K = {};
+D.BUILDINGS.forEach(function (b) { D.BUILD_BY_K[b.k] = b; });
+
+/* ---------------- 宗门等级 ---------------- */
+D.LEVELS = [
+  { n: '破落户',   need: 0,     cap: 2 },
+  { n: '三流门派', need: 120,   cap: 3 },
+  { n: '二流门派', need: 420,   cap: 4 },
+  { n: '一流门派', need: 1100,  cap: 5 },
+  { n: '名门大派', need: 2600,  cap: 6 },
+  { n: '一方仙宗', need: 5600,  cap: 8 },
+  { n: '天下第一', need: 11000, cap: 8 }
+];
+
+/* ---------------- 年度任务（派弟子，耗 1 行动点） ---------------- */
+D.TASKS = [
+  { k: 'yao',    n: '下山除妖', icon: '妖', need: 'power', diff: 1.0,
+    d: '打一架，赚灵石和声望。打输会挂彩。', gain: { stone: 90, fame: 14 } },
+  { k: 'cai',    n: '进山采药', icon: '药', need: 'mu', diff: 0.6,
+    d: '稳赚药材，基本没风险。木灵根有加成。', gain: { herb: 16 } },
+  { k: 'wa',     n: '下矿挖石', icon: '矿', need: 'jin', diff: 0.6,
+    d: '稳赚矿石。金灵根挖得更快。', gain: { ore: 12 } },
+  { k: 'jiang',  n: '开坛讲学', icon: '讲', need: 'ins', diff: 0.5,
+    d: '涨声望，顺带让年轻弟子开窍。', gain: { fame: 22, grow: 0.1 } },
+  { k: 'hu',     n: '护送商队', icon: '商', need: 'power', diff: 0.8,
+    d: '灵石给得多，路上可能出事。', gain: { stone: 130 } },
+  { k: 'mi',     n: '探查秘境', icon: '秘', need: 'luck', diff: 1.1,
+    d: '捞残卷和奇物，最容易撞上抉择。', gain: { scroll: 2, fame: 8 } },
+  { k: 'ti',     n: '上门踢馆', icon: '踢', need: 'power', diff: 1.5,
+    d: '一次涨一大截声望，但从此跟人结仇。', gain: { fame: 55, stone: 60 } },
+  { k: 'bi',     n: '闭死关',   icon: '关', need: 'none', diff: 0,
+    d: '这一年不干活，修为翻两倍半。', gain: { qi: 2.5 } }
+];
+
+/* ---------------- 道具 ---------------- */
+D.ITEMS = [
+  { k: 'juqi',   n: '聚气丹', icon: '丹', type: 'pill', d: '给一名弟子 +80 修为', price: 60,  eff: { qi: 80 } },
+  { k: 'pojing', n: '破境丹', icon: '丹', type: 'pill', d: '下次突破必成，且不掉修为', price: 130, eff: { up: 1 } },
+  { k: 'huichun',n: '回春丹', icon: '丹', type: 'pill', d: '治好一名重伤弟子', price: 70,  eff: { heal: 1 } },
+  { k: 'xisui',  n: '洗髓丹', icon: '丹', type: 'pill', d: '给一名弟子提一档资质', price: 260, eff: { quality: 1 } },
+  { k: 'zhuyan', n: '驻颜丹', icon: '丹', type: 'pill', d: '一名弟子延寿 30 年', price: 110, eff: { life: 30 } },
+  { k: 'feijian',n: '飞剑',   icon: '器', type: 'gear', d: '装备后战力 +25%', price: 150, eff: { power: 0.25 } },
+  { k: 'jing',   n: '护心镜', icon: '器', type: 'gear', d: '装备后不容易战死', price: 120, eff: { guard: 1 } },
+  { k: 'zhenpan',n: '阵盘',   icon: '器', type: 'gear', d: '宗门战全队 +12%', price: 190, eff: { war: 0.12 } },
+  { k: 'gongfa', n: '功法残卷', icon: '卷', type: 'scroll', d: '给一名弟子换一门功法，涨修为速度', price: 90, eff: { grow: 0.3 } },
+  { k: 'ling',   n: '招募令', icon: '令', type: 'scroll', d: '免费招一次弟子', price: 100, eff: { recruit: 1 } },
+  { k: 'tie',    n: '保命符', icon: '符', type: 'scroll', d: '下一次必死事件强制化险为夷', price: 140, eff: { save: 1 } },
+  { k: 'jiu',    n: '一坛老酒', icon: '酒', type: 'fun', d: '喝了什么都不发生，但有人会很高兴', price: 20, eff: { fun: 1 } }
+];
+D.ITEM_BY_K = {};
+D.ITEMS.forEach(function (it) { D.ITEM_BY_K[it.k] = it; });
+
+/* ---------------- 外敌 / 宗门战 ---------------- */
+D.ENEMIES = [
+  { k: 'shou',  n: '妖兽潮',     d: '山下的妖兽饿疯了，成群往山上涌。', power: 90,   minLv: 0, gain: { stone: 120, herb: 20, fame: 30 } },
+  { k: 'chi',   n: '赤霞宗来问罪', d: '隔壁赤霞宗说你抢了他们的灵脉，带人堵门。', power: 260,  minLv: 1, gain: { stone: 220, fame: 70 } },
+  { k: 'moxiu', n: '魔修围山',   d: '一伙魔修看上了你的丹房。', power: 520,  minLv: 2, gain: { stone: 380, herb: 40, fame: 110 } },
+  { k: 'san',   n: '散修讨说法', d: '一群散修说你弟子下山欺负人。', power: 380,  minLv: 1, gain: { fame: 60, stone: 90 } },
+  { k: 'dabi',  n: '九宗大比',   d: '九家门派摆擂台，赢的拿走全部彩头。', power: 900,  minLv: 3, gain: { fame: 260, stone: 500, scroll: 3 } },
+  { k: 'xiong', n: '上古凶兽',   d: '后山裂开一道缝，里头的东西醒了。', power: 1800, minLv: 4, gain: { fame: 400, ore: 120, scroll: 4 } },
+  { k: 'momen', n: '魔道围剿',   d: '三家魔门联手，说你挡了他们的路。', power: 3200, minLv: 5, gain: { fame: 700, stone: 1200 } },
+  { k: 'tian',  n: '九重天劫',   d: '有人要飞升了，天跟着塌下来半边。', power: 6000, minLv: 6, gain: { fame: 1500, scroll: 8 } }
+];
+
+/* ---------------- 成就 ---------------- */
+D.ACH = [
+  { k: 'first',   n: '开张',       d: '招到第一个弟子' },
+  { k: 'ten',     n: '像点样子',   d: '同时有 10 名在册弟子' },
+  { k: 'jiao',    n: '捡到宝',     d: '招到一名天骄' },
+  { k: 'yao',     n: '这合理吗',   d: '招到一名妖孽' },
+  { k: 'jin',     n: '金丹了',     d: '有弟子结成金丹' },
+  { k: 'fei',     n: '有人飞升',   d: '有弟子飞升' },
+  { k: 'fu',      n: '富甲一方',   d: '灵石存到 5000' },
+  { k: 'lv3',     n: '一流门派',   d: '宗门升到一流' },
+  { k: 'lv6',     n: '天下第一',   d: '宗门升到天下第一' },
+  { k: 'win',     n: '没输过',     d: '连赢 5 场宗门战' },
+  { k: 'beat',    n: '以弱胜强',   d: '战力落后还打赢一场' },
+  { k: 'dan',     n: '一炉十丹',   d: '一次炼出 5 颗以上丹药' },
+  { k: 'egg3',    n: '有点东西',   d: '一局里找出 3 个彩蛋' },
+  { k: 'egg8',    n: '掘地三尺',   d: '一局里找出 8 个彩蛋' },
+  { k: 'pai',     n: '人各有志',   d: '把弟子派去做过 6 种不同任务' },
+  { k: 'luan',    n: '后院起火',   d: '经历过弟子叛门' },
+  { k: 'jiu',     n: '妙手回春',   d: '把濒死弟子救回来' },
+  { k: 'chuan',   n: '二代目',     d: '完成一次传位' },
+  { k: 'chuan3',  n: '三代目',     d: '完成三次传位' },
+  { k: 'ad',      n: '支持一下',   d: '看过一次广告' },
+  { k: 'allbuild',n: '什么都盖',   d: '11 种建筑全建起来' },
+  { k: 'wuxing',  n: '五行齐全',   d: '同时有金木水火土五种灵根弟子' }
+];
+
+/* ---------------- 内置玩家分布样本（用于"百分之几和你一样"） ---------------- */
+/* 每项：路径权重 / 选择人气基准。真实上线可换成服务端统计。 */
+D.POP = {
+  path:   { zheng: 0.38, mo: 0.24, zhong: 0.22, shang: 0.16 },
+  master: { jian: 0.36, dan: 0.27, zhen: 0.22, fu: 0.15 },
+  ending: { feisheng: 0.07, yitong: 0.11, fumi: 0.21, yinshi: 0.17, chengmo: 0.09, fujia: 0.14, pingdan: 0.21 },
+  opts:   [0.46, 0.33, 0.21]
+};
+
+D.fmt = function (n) { return Math.round(n); };
+D.clamp = function (v, a, b) { return v < a ? a : (v > b ? b : v); };
+
+module.exports = D;
+
+});
+__def('sect-story', function (module, exports, __req) {
+/* 破山门 · 事件 / 剧情 / 文案库
+ * 全是白话。固定对手反复登场，选择会改后面的剧情标记。
+ * 所有人物、地名、台词、桥段均为本项目自写。
+ */
+var S = {};
+
+function O(n, d, e, ex) {
+  var o = { n: n, d: d, e: e || {} };
+  if (ex) for (var k in ex) o[k] = ex[k];
+  return o;
+}
+function E(id, t, who, x, opts, tag, w, cond) {
+  return { id: id, t: t, who: who || '', x: x, opts: opts, tag: tag || '日常', w: w || 10, cond: cond || {} };
+}
+
+/* =========================================================
+ * 一、普通事件（50 条）
+ * e 字段：stone/herb/ore/fame/scroll/qi/loyalty/power/recruit/item/egg/hurt/flag/relation
+ * flag 会写进 S.flags，后面的事件用 cond.reqFlag / cond.noFlag 判定
+ * ========================================================= */
+S.EVENTS = [
+  /* ---- 开局与日常 ---- */
+  E('e01', '门口躺着个人', '一个脏兮兮的少年',
+    '清早开门，门槛上横着个昏过去的少年。怀里死死攥着半张纸，上头就俩字：收我。',
+    [O('抬进去，先给口热的', '多一张嘴，也多一双手', { recruit: 1, fame: 4 }, { flag: 'menkou' }),
+     O('翻翻他兜里有没有值钱的', '做人要务实', { stone: 45, loyalty: -2 }, { flag: 'menkou_leng' }),
+     O('关门，当没看见', '山门事多', { herb: 3 }, { flag: 'menkou_bu' })], '开局', 12),
+
+  E('e02', '第一天就有人来收保护费', '青石镇 · 癞三',
+    '一个瘸腿汉子带俩人堵在山门口，说这座山头以前是他们看的，一月二十块灵石。',
+    [O('给钱，先稳住', '花钱买清净', { stone: -20, fame: 2 }),
+     O('让弟子把他架出去', '立威要趁早', { fame: 12, power: 0.02 }, { risk: 0.3, flag: 'laisan_bad' }),
+     O('跟他讲道理，讲一炷香', '他听着听着睡着了', { herb: 2, scroll: 1 }, { egg: 'jiangli' })], '开局', 11),
+
+  E('e03', '匾额掉了', '山门大殿',
+    '半夜哐当一声，新挂的匾摔成两半。值夜的弟子赌咒发誓说没人碰过。',
+    [O('重做一块，写大点', '面子工程不能省', { stone: -35, fame: 8 }),
+     O('拿绳子捆回去继续挂', '能看清字就行', { stone: 5, loyalty: -1 }, { egg: 'bian' }),
+     O('查！查到底', '查出来是老鼠啃的', { herb: 4, scroll: 1 })], '日常', 9),
+
+  E('e04', '厨子跑了', '后厨',
+    '管饭的老周留了张条：菜太难做，人太能吃，走了。锅里还剩半锅糊的。',
+    [O('加钱把人请回来', '吃饭是大事', { stone: -50, loyalty: 3 }),
+     O('轮流做饭', '全宗门学会了不挑食', { loyalty: -2, herb: 8 }, { egg: 'lunch' }),
+     O('让弟子辟谷', '省粮，但没人高兴', { stone: 30, grow: 0.06, loyalty: -3 })], '日常', 9),
+
+  E('e05', '有人在山下摆摊卖你们的丹', '药铺 · 钱三娘',
+    '钱三娘摊上摆着一排丹药，标签写着「破山门秘制」，一颗卖三十块。你们压根没开过丹房。',
+    [O('找她算账', '她理直气壮：这叫帮你扬名', { fame: 20, stone: 30 }, { flag: 'qian_bad' }),
+     O('干脆跟她合作', '假丹变真丹，五五分账', { stone: 120, herb: -10 }, { flag: 'qian_friend' }),
+     O('买一颗尝尝', '……居然还真有点用', { item: 'juqi', scroll: 1 }, { egg: 'jiadan' })], '经营', 10),
+
+  E('e06', '藏经阁闹贼', '藏经阁',
+    '守阁弟子说夜里听见翻书声，早上一看，书一本没少，倒是多了一摞别人家的功法。',
+    [O('照单全收', '来都来了', { scroll: 3, fame: -5 }, { egg: 'zei' }),
+     O('设个套抓人', '抓到个来还书的老头', { scroll: 2, recruit: 1 }),
+     O('把门焊死', '以后谁也别进', { scroll: -1, grow: -0.04 })], '经营', 9),
+
+  E('e07', '天上下石头', '后山',
+    '后山掉了块黑乎乎的陨石，摸着烫手。弟子们围了一圈，谁也不敢先碰。',
+    [O('搬去器坊熔了', '能出不少好铁', { ore: 30 }, { flag: 'yunshi' }),
+     O('供在殿里当镇派之宝', '看着挺唬人', { fame: 18, stone: -10 }),
+     O('让最愣的弟子摸一下', '他毫发无伤，还打了个饱嗝', { qi: 60, loyalty: 1 }, { egg: 'yunshi' })], '奇遇', 9),
+
+  E('e08', '有人来投，说只要一口饭', '一个中年散修',
+    '那人站在门口，说自己四十多了还没筑基，别的不会，扫地能扫得特别干净。',
+    [O('收下', '山门总得有人扫', { recruit: 1, loyalty: 2 }, { flag: 'saodi' }),
+     O('给两个馒头让他走', '他鞠躬走了', { fame: 5, herb: -2 }),
+     O('问他凭什么', '他当场把院子扫完了', { recruit: 1, scroll: 1 }, { egg: 'saodi' })], '日常', 10),
+
+  E('e09', '弟子打起来了', '演武堂',
+    '两人为了一句「你师父不行」打到演武堂塌了半边墙。周围还站了一圈看热闹的。',
+    [O('各罚抄经三遍', '和稀泥，但管用', { loyalty: 1, herb: -3 }),
+     O('让他们打完，摆擂台卖票', '赚了，还选出个能打的', { stone: 70, power: 0.05 }, { egg: 'piao' }),
+     O('一起罚去闭关', '关到没脾气', { qi: 40, loyalty: -2 })], '弟子', 10),
+
+  E('e10', '账对不上', '账房',
+    '月底盘点，少了三十块灵石。账房先生把算盘打了三遍，脸越来越白。',
+    [O('查账', '查出来是买米记重了', { stone: 30, scroll: 1 }),
+     O('算了', '账房松了口气，从此死心塌地', { loyalty: 3 }, { flag: 'zhang_hao' }),
+     O('把账本烧了', '以后再也不会对不上', { stone: -10 }, { egg: 'zhang' })], '经营', 9),
+
+  /* ---- 弟子线 ---- */
+  E('e11', '有人半夜偷练', '弟子寮',
+    '巡夜看见柴房有光。推门一瞧，白天最不起眼那个弟子，正在练一套谁也没教过的剑。',
+    [O('装没看见', '有些事别打断', { qi: 120, power: 0.08 }, { flag: 'toulian' }),
+     O('当场收作亲传', '赌一把', { qi: 180, loyalty: 3, scroll: -1 }, { flag: 'toulian' }),
+     O('罚他明天多挑十担水', '练剑挑水两不误', { herb: 10, loyalty: -1 })], '弟子', 10, { minYear: 3 }),
+
+  E('e12', '天骄要走了', '弟子寮',
+    '门里最能打的那个弟子收拾好了包袱，说别处给的更多，站在山门口等你一句话。',
+    [O('加倍留人', '钱能解决大部分事', { stone: -160, loyalty: 5 }),
+     O('让他走，别拦', '走得体面，日后好相见', { fame: 15, loyalty: 2 }, { flag: 'fangzou' }),
+     O('跟他打一场，赢了才准走', '他愣了一下，把包袱放下了', { power: 0.06, loyalty: 1 }, { egg: 'daiyi' })], '弟子', 9, { minYear: 6 }),
+
+  E('e13', '弟子带回一只野猫', '一个热心弟子',
+    '他袈裟里揣着只三花猫，说山下快下雪了。猫一进殿就跳上供桌，把香灰扒了一地。',
+    [O('养着', '宗门从此有猫', { loyalty: 3, herb: -2 }, { flag: 'mao' }),
+     O('送走', '弟子难过了三天', { loyalty: -1 }),
+     O('封它做个「巡山使」', '反正也不用干活', { fame: 8, scroll: 1 }, { egg: 'mao' })], '弟子', 9),
+
+  E('e14', '有人顿悟了', '论道台',
+    '讲道讲到一半，后排一个弟子突然哭了，说想通了一件卡了七年的小事。',
+    [O('让他接着想', '别打扰', { qi: 150, grow: 0.05 }),
+     O('当场问他想的啥', '他说：忘了', { scroll: 1 }, { egg: 'dunwu' }),
+     O('把这一刻记进宗门志', '后人会抄', { fame: 12 })], '弟子', 9, { minYear: 4 }),
+
+  E('e15', '两个弟子要结侣', '弟子寮',
+    '两人一齐跪在殿前，说想结为道侣，又怕耽误修炼，话说得结结巴巴。',
+    [O('准了，摆一桌', '喜事', { loyalty: 4, grow: 0.06, herb: -10 }, { flag: 'daolv' }),
+     O('不准，修行要紧', '两人没再提', { qi: 60, loyalty: -3 }),
+     O('让他俩先比一场', '赢了那个说了算', { power: 0.04, loyalty: 1 }, { egg: 'daolv' })], '弟子', 9, { minYear: 5 }),
+
+  E('e16', '有人闯祸了', '山下青石镇',
+    '一个火灵根弟子下山买糖，把人家的柴垛点着了。镇长带着人堵在山门口。',
+    [O('赔钱道歉', '破财免灾', { stone: -80, fame: 5 }),
+     O('让弟子自己去赔礼', '他去了，还顺手帮人修好了房顶', { fame: 18, loyalty: 2 }, { flag: 'chuanghuo_hao' }),
+     O('护短，把人轰走', '镇上从此不卖你米', { herb: -12, fame: -15 }, { flag: 'zhen_bad' })], '弟子', 10),
+
+  E('e17', '老弟子坐化了', '弟子寮',
+    '跟了宗门几十年的老弟子，早上没起来。枕边压着一张纸，写着「房里的书留给后来人」。',
+    [O('厚葬，立个牌位', '该有的规矩', { stone: -40, fame: 20, scroll: 2 }),
+     O('把他的名字刻在山门上', '以后进门的人都看得见', { fame: 28, loyalty: 4 }, { egg: 'mingzi' }),
+     O('照常开工', '山门不等人', { qi: 50 })], '弟子', 8, { minYear: 18 }),
+
+  E('e18', '有个弟子一直不说话', '弟子寮',
+    '入门三年，没人听过他讲话。有人说他是哑巴，有人说他只是懒得开口。',
+    [O('找他聊聊', '他开口第一句是：饭能再加点吗', { loyalty: 2, herb: 5 }, { egg: 'yaba' }),
+     O('安排去守藏经阁', '清静地方配清静人', { scroll: 2, grow: 0.04 }),
+     O('不打扰', '各自安好', { qi: 30 })], '弟子', 9),
+
+  E('e19', '弟子捡了本破书', '山下旧摊',
+    '封皮没了，头一页写着「练了可能没事，也可能有事」。摊主开价二十块。',
+    [O('买', '赌一把', { stone: -20, scroll: 2, qi: 40 }),
+     O('不买，抄下来', '摊主没发现', { scroll: 1, fame: -4 }, { egg: 'chaoshu' }),
+     O('让弟子自己决定', '他买了，第二天在床上躺了一天', { item: 'jiu', loyalty: 1 })], '奇遇', 9),
+
+  E('e20', '有人要拜师', '山门口',
+    '一个小孩每天来，蹲在门口看练功，赶也不走，已经蹲了十一天。',
+    [O('收了', '第十二天他进门了', { recruit: 1, loyalty: 3 }, { flag: 'xiaohai' }),
+     O('给本书让他回去看', '他看完又来了', { scroll: 1, fame: 6 }),
+     O('问他图什么', '他说：你们饭看起来香', { herb: 6, recruit: 1 }, { egg: 'fan' })], '弟子', 10),
+
+  /* ---- 赤霞宗线（贯穿全局的对手） ---- */
+  E('e21', '赤霞宗送帖子来了', '赤霞宗 · 赵无咎',
+    '红纸金字，措辞客气，意思是：你这座山头，三年前是我们丢的，要不要商量商量。',
+    [O('回帖：不商量', '硬气', { fame: 20 }, { flag: 'chi_hen' }),
+     O('请他上山喝茶', '茶喝完了，话没谈拢', { stone: -20, fame: 8, scroll: 1 }, { flag: 'chi_cha' }),
+     O('把帖子裱起来挂大殿', '来客都看得见', { fame: 14 }, { egg: 'tiezi' })], '赤霞宗', 11, { minYear: 2 }),
+
+  E('e22', '赵无咎来踢馆', '赤霞宗 · 赵无咎',
+    '他一个人上山，连剑都没带，站在演武堂中间说：你们谁上，都行。',
+    [O('派最能打的', '打一场再说', { war: 'chi1', fame: 20 }, { flag: 'chi_da' }),
+     O('掌门亲自上', '输赢都算你的', { power: 0.08, fame: 25, hurt: 1 }, { flag: 'chi_da' }),
+     O('请他吃饭', '他吃完抹嘴走了，说下回再来', { herb: -8, stone: 20 }, { flag: 'chi_fan', egg: 'zhao_fan' })], '赤霞宗', 10, { reqFlag: 'chi_hen' }),
+
+  E('e23', '赵无咎又来了', '赤霞宗 · 赵无咎',
+    '这回他带了个小姑娘，说是他闺女赵小满，想放你这儿「见见世面」。怎么看都像塞个人进来。',
+    [O('收下，当弟子', '多个眼睛也多个变数', { recruit: 1, fame: 10 }, { flag: 'xiaoman' }),
+     O('婉拒', '他也没恼', { fame: 5 }),
+     O('收下，但让她记账', '账房的算盘从此没停过', { recruit: 1, stone: 60 }, { egg: 'xiaoman' })], '赤霞宗', 10, { reqFlag: 'chi_da' }),
+
+  E('e24', '赤霞宗出事了', '赵小满',
+    '赵小满半夜来敲门，衣裳都跑歪了：赤霞宗被人围了，她爹让他们先别回来。',
+    [O('带人去救', '这一去就是一整夜', { war: 'chi2', fame: 40, stone: -50 }, { flag: 'chi_jiu' }),
+     O('收留她，别管别的', '山门先护住自己人', { loyalty: 4, fame: -10 }, { flag: 'chi_bu' }),
+     O('问清楚是谁围的再说', '她说了个你没听过的名字', { scroll: 2, flag: 'momen' })], '赤霞宗', 9, { reqFlag: 'xiaoman' }),
+
+  E('e25', '赵无咎落魄了', '赤霞宗 · 赵无咎',
+    '当年那个连剑都不带就上山的人，如今拄着根竹棍站在门口，说想讨个看门的活。',
+    [O('收下，让他看门', '山门挺大', { recruit: 1, fame: 25 }, { flag: 'zhao_gui' }),
+     O('给笔钱送走', '他把钱推回来了', { stone: -100, fame: 10 }, { egg: 'zhao_qian' }),
+     O('请他进殿，坐主位', '他坐了很久，没说话', { fame: 35, scroll: 3 }, { flag: 'zhao_gui' })], '赤霞宗', 8, { reqFlag: 'chi_jiu' }),
+
+  E('e26', '赵小满要走了', '赵小满',
+    '她说想把赤霞宗那块牌子重新挂回去。走之前把账本理得整整齐齐，一页不差。',
+    [O('给她一块自己的匾', '挂哪儿随她', { fame: 30, stone: -60 }, { flag: 'chi_he' }),
+     O('让她带走几个弟子', '人跟人走', { fame: 20, loyalty: -2 }),
+     O('不留，也不拦', '她鞠了一躬', { scroll: 2 }, { egg: 'zhangben' })], '赤霞宗', 8, { reqFlag: 'xiaoman', minYear: 12 }),
+
+  E('e27', '两家要结盟', '赤霞宗 · 赵小满',
+    '她带着礼上山，说往后山下这条道，两家一起守。',
+    [O('结', '省下不少麻烦', { fame: 50, stone: 120 }, { flag: 'chi_meng' }),
+     O('不结，各走各的', '她把礼留下了', { herb: 20, fame: 5 }),
+     O('结，但立个字据', '白纸黑字，谁也别赖', { fame: 40, scroll: 2 }, { egg: 'ziju' })], '赤霞宗', 8, { reqFlag: 'chi_he' }),
+
+  E('e28', '有人冒名', '青石镇',
+    '镇上冒出个「赤霞宗分部」，收徒收钱，招牌做得比真的还像。赵无咎气得直咳嗽。',
+    [O('一起去拆招牌', '老头难得精神了一回', { fame: 30, stone: 80 }, { flag: 'zhao_gui' }),
+     O('不管，看它能撑几天', '撑了十一天', { scroll: 1 }, { egg: 'maoming' }),
+     O('也挂个「破山门分部」', '比谁像', { fame: 18, stone: 40 })], '赤霞宗', 8, { reqFlag: 'zhao_gui' }),
+
+  /* ---- 妖王线 ---- */
+  E('e29', '后山有动静', '后山',
+    '连着三夜，后山有东西低低地哼。羊少了一只，篱笆上留着一道挺深的爪印。',
+    [O('派弟子去看看', '看清了，也看清了自己', { war: 'shou1', herb: 10 }, { flag: 'yao_jian' }),
+     O('把篱笆加高', '加高到第二天还是倒了', { ore: 8 }, { egg: 'liba' }),
+     O('放点吃的在山口', '第二天东西没了，羊回来了', { herb: -10, fame: 8 }, { flag: 'yao_wei' })], '妖王', 10, { minYear: 3 }),
+
+  E('e30', '它开口了', '妖王 · 黑角',
+    '一头黑鹿站在雾里，个头比殿还高。它说：山是你们的，洞是我的，别再往下挖了。',
+    [O('答应，划条线', '各自过各自的', { ore: -10, fame: 20 }, { flag: 'yao_he' }),
+     O('不答应，矿还得挖', '它看了你很久，转身走了', { ore: 40, fame: -10 }, { flag: 'yao_bad' }),
+     O('问它洞里有什么', '它说：书', { scroll: 4 }, { egg: 'heijiao' })], '妖王', 9, { reqFlag: 'yao_jian' }),
+
+  E('e31', '黑角受伤了', '妖王 · 黑角',
+    '它侧躺在山口，身上插着一把不认识的剑。看见你来，把头扭了过去。',
+    [O('拔剑，救它', '欠一条命', { herb: -20, fame: 30, scroll: 3 }, { flag: 'yao_ming' }),
+     O('绕着走', '第二天山口空了', { ore: 15 }),
+     O('把剑收走，人不管', '剑是好剑，事是坏事', { item: 'feijian', fame: -15 }, { egg: 'jian' })], '妖王', 8, { reqFlag: 'yao_he' }),
+
+  E('e32', '山下猎户要杀它', '青石镇 · 猎户',
+    '一伙人扛着家伙上山，说那头黑鹿吃了他们两窝猪，非要剥了它。',
+    [O('拦下来', '花了点钱，也结了个梁子', { stone: -90, fame: 20 }, { flag: 'yao_ming' }),
+     O('让他们去', '山上安静了', { herb: 30, fame: -20 }, { flag: 'yao_si' }),
+     O('把猪钱赔了，事按下去', '两边都觉得自己赢了', { stone: -60, fame: 10 }, { egg: 'zhu' })], '妖王', 8, { reqFlag: 'yao_he' }),
+
+  E('e33', '它来还东西', '妖王 · 黑角',
+    '洞口多了一堆东西：几块矿石、一卷看不懂的皮子、还有当年那只羊的铃铛。',
+    [O('收下', '铃铛擦干净挂殿里', { ore: 40, scroll: 3, fame: 15 }, { flag: 'yao_you' }),
+     O('只留铃铛', '别的送回去', { fame: 25 }, { egg: 'lingdang' }),
+     O('回赠一坛酒', '第二天洞口多了个空坛', { item: 'jiu', loyalty: 2 })], '妖王', 7, { reqFlag: 'yao_ming' }),
+
+  /* ---- 经营与抉择 ---- */
+  E('e34', '有人开价买你的山', '青石镇 · 富户',
+    '一个胖员外拿着地契上山，开的价够你把大殿翻三遍。他说这山风水好，想修祖坟。',
+    [O('不卖', '山门不是买卖', { fame: 25 }, { egg: 'maishan' }),
+     O('卖，另寻山头', '钱到手，弟子们一路骂', { stone: 900, loyalty: -8, fame: -30 }),
+     O('把价抬三倍', '他真答应了，然后没带够钱', { stone: 120, fame: 5 })], '经营', 9, { minYear: 5 }),
+
+  E('e35', '丹炉炸了', '丹房',
+    '一声闷响，房顶多了个洞，炼丹弟子从灰里爬出来，手里还举着一颗黑乎乎的东西。',
+    [O('先救人', '人没事，丹也还能吃', { herb: -10, item: 'juqi', loyalty: 2 }),
+     O('先捡丹', '……弟子记住了', { item: 'juqi', loyalty: -4 }, { egg: 'luzha' }),
+     O('把洞留着当天窗', '采光确实好了', { herb: 6, fame: 5 })], '经营', 9, { needBuild: 'alchemy' }),
+
+  E('e36', '来了个卖保险的', '一个笑眯眯的道人',
+    '他说交点灵石，往后宗门出事他包赔。合同写了三页，字特别小。',
+    [O('签', '祈祷别出事', { stone: -60 }, { flag: 'baoxian' }),
+     O('不签', '他笑眯眯地走了', { stone: 5 }),
+     O('让他先念一遍合同', '念到第二页他自己跑了', { scroll: 1 }, { egg: 'hetong' })], '经营', 9),
+
+  E('e37', '矿挖出个洞', '矿脉',
+    '一镐下去，底下空了。火把照进去，石壁上有人刻了字，年份比宗门早得多。',
+    [O('进去', '里头别有洞天', { secret: 1, ore: 20 }, { flag: 'dong' }),
+     O('封起来', '有些东西不碰为好', { ore: 10, fame: 8 }),
+     O('让最懒的弟子进去', '他在里头睡了一觉，出来变强了', { qi: 200 }, { egg: 'dong' })], '奇遇', 9, { needBuild: 'mine' }),
+
+  E('e38', '钱三娘来赊账', '药铺 · 钱三娘',
+    '她说这批药材先拿去用，卖了再给钱。上回这么说的那家，现在还欠着。',
+    [O('赊给她', '做生意图个长远', { herb: 25, fame: 10 }, { flag: 'qian_friend' }),
+     O('现结，不赊', '她撇撇嘴，还是付了', { stone: 40 }),
+     O('反过来找她借灵石', '她愣了半天，借了', { stone: 150, fame: -5 }, { egg: 'she' })], '经营', 9),
+
+  E('e39', '有人贴你大字报', '青石镇口',
+    '墙上贴了张纸，把宗门这些年的事数了一遍，有一半是真的，另一半编得挺精彩。',
+    [O('撕了', '手快', { fame: -5 }),
+     O('在旁边贴一张更正', '越描越黑，但人气涨了', { fame: 18, scroll: 1 }, { egg: 'dazibao' }),
+     O('把纸收起来存档', '以后写宗门志用得上', { scroll: 2 })], '经营', 9),
+
+  E('e40', '大旱', '山下青石镇',
+    '三个月没下雨，镇上井快见底了。有人上山，问你们能不能「想想办法」。',
+    [O('开灵田的水给他们', '自家药材要减产', { herb: -20, fame: 45 }, { flag: 'zhen_hao' }),
+     O('拿灵石去别处买粮', '花得多，落个好名', { stone: -150, fame: 35 }),
+     O('让水灵根弟子试着求雨', '下了两滴，但全镇都看见了', { fame: 25, qi: 60 }, { egg: 'qiuyu' })], '经营', 9, { minYear: 6 }),
+
+  E('e41', '有弟子想下山开分号', '一个大弟子',
+    '他说想去镇上挂块「破山门」的牌子，收徒教拳，赚了三七分。',
+    [O('准', '多一条来钱路', { stone: 100, fame: 20 }, { flag: 'fenhao' }),
+     O('不准，人不够', '他没再提', { loyalty: -1 }),
+     O('准，但招牌得小一号', '他去做了个更大的', { stone: 80, fame: 15 }, { egg: 'zhaopai' })], '经营', 9, { minYear: 8 }),
+
+  E('e42', '分号出事了', '镇上分号',
+    '镇上传话来说，分号那小子把人打伤了，对方躺在家门口不肯走。',
+    [O('亲自下山赔罪', '事压下去了', { stone: -120, fame: 15 }, { flag: 'fenhao_hao' }),
+     O('把分号关了', '干净利落', { stone: -30, fame: -10 }),
+     O('让赵无咎去谈', '老头出马，一个顶仨', { fame: 25, scroll: 1 }, { egg: 'zhao_tan' })], '经营', 8, { reqFlag: 'fenhao' }),
+
+  /* ---- 奇遇与彩蛋向 ---- */
+  E('e43', '一个老头在门口下棋', '不知名的老头',
+    '他摆了张棋盘，自己跟自己下，见人就说：来一局？输了给我讲个故事就行。',
+    [O('下一局', '输了，讲了个故事', { scroll: 3, fame: 10 }, { egg: 'qi' }),
+     O('没空', '他说：那下回', { stone: 10 }),
+     O('把棋盘转个方向', '他盯着看了半天，说这步我没见过', { grow: 0.08, scroll: 2 }, { flag: 'qilaotou' })], '奇遇', 9),
+
+  E('e44', '下了一夜的雨', '山门',
+    '雨停之后，院子里冒出一排蘑菇，排得整整齐齐，像个箭头，指着后山。',
+    [O('顺着走', '走到一处没人来过的坡地', { herb: 20, secret: 1 }, { egg: 'mogu' }),
+     O('采了炒了', '挺鲜', { herb: 12, loyalty: 2 }),
+     O('画下来记进宗门志', '后人都说看不懂', { scroll: 1 })], '奇遇', 8),
+
+  E('e45', '有人送来一口棺材', '山门口',
+    '没署名，没字条，抬来的人放下就走。棺材不重，晃着有响。',
+    [O('开', '里头是一整箱旧残卷', { scroll: 6, fame: -5 }, { egg: 'guancai' }),
+     O('埋了', '省心', { fame: 8 }),
+     O('先敲三下', '里头敲了三下回来', { item: 'tie', scroll: 2 }, { flag: 'guancai_qiao' })], '奇遇', 8),
+
+  E('e46', '宗门志该写了', '藏经阁',
+    '管书的弟子捧着空白册子来问：头一页写什么？',
+    [O('写「某年某月，开门」', '实话', { fame: 10 }, { egg: 'zongmenzhi' }),
+     O('写一句狠话', '后人抄了两百年', { fame: 20, scroll: 1 }),
+     O('先空着', '等有值得写的事', { grow: 0.04 })], '奇遇', 8, { minYear: 10 }),
+
+  E('e47', '有人在山下说书', '青石镇 · 说书先生',
+    '他把你宗门编成了三段，段段离谱，台下笑得前仰后合。弟子听得脸都红了。',
+    [O('上台把真的讲一遍', '没人信', { fame: 15 }, { egg: 'shuoshu' }),
+     O('给说书先生塞点钱', '下回版本好听了', { stone: -30, fame: 25 }),
+     O('不管，随他编', '名气反倒起来了', { fame: 12, scroll: 1 })], '奇遇', 8),
+
+  E('e48', '捡到个迷路的', '后山',
+    '一个背着大包袱的少年在山里转了三天，坚信自己找的是「青云宗」。这儿叫破山门。',
+    [O('将错就错收下', '他半年后才发现', { recruit: 1, loyalty: 2 }, { egg: 'milu' }),
+     O('指条路让他走', '他往更深处走了', { herb: 5 }),
+     O('给他改个门牌', '把「破山门」临时遮一下', { stone: 40, fame: 8 })], '奇遇', 8),
+
+  E('e49', '一年到头，没什么事', '山门',
+    '这一年没人来踢馆，没人闯祸，丹没炸，饭够吃。弟子们照常练功，猫照常晒太阳。',
+    [O('挺好', '难得', { loyalty: 3, qi: 30 }, { egg: 'pingdan' }),
+     O('总觉得要出事', '翻了翻账本，睡了', { scroll: 1 }),
+     O('摆一桌', '没什么由头，就是想摆', { herb: -10, loyalty: 4 })], '日常', 7, { minYear: 12 }),
+
+  E('e50', '有人问：图什么', '一个要走的弟子',
+    '他收拾好包袱，临出门回头问了一句：掌门，守这么个山头，到底图什么？',
+    [O('图他们能回来', '他站了一会儿，没走', { loyalty: 5, fame: 20 }, { flag: 'tushenme' }),
+     O('图个清净', '他点点头，走了', { scroll: 2 }),
+     O('我也想知道', '两人一起在门口坐到天亮', { grow: 0.1, scroll: 3 }, { egg: 'tushenme' })], '奇遇', 7, { minYear: 20 })
+];
+
+/* =========================================================
+ * 二、秘境抉择链（三段，每段 3 选 1，选择影响下一段）
+ * ========================================================= */
+S.SECRETS = [
+  { id: 's1', t: '秘境 · 第一道门', who: '石门上的字',
+    x: '门上刻着：「进来的都得留点什么」。门缝里往外吹冷风，地上有好几串脚印，都只进不出。',
+    opts: [
+      O('留一撮头发', '合规矩，走得稳', { fame: 5 }, { next: 's2a' }),
+      O('留一块灵石', '门开得特别痛快', { stone: -20, scroll: 1 }, { next: 's2b' }),
+      O('什么都不留，硬推', '门开了，但里头灯全灭了', { qi: 60, hurt: 1 }, { next: 's2c', egg: 'yingtui' })
+    ] },
+  { id: 's2a', t: '秘境 · 长廊', who: '墙上的画',
+    x: '长廊两边全是画，画的是同一座山门，一年一张。翻到最后一张，画上的匾额是空的。',
+    opts: [
+      O('把自己的名字添上去', '笔一落，整条廊亮了', { fame: 30, qi: 100 }, { next: 's3a', egg: 'hua' }),
+      O('接着往前走', '后面还有更亮的', { scroll: 2 }, { next: 's3b' }),
+      O('数一数一共多少张', '数到一半忘了', { grow: 0.08 }, { next: 's3b' })
+    ] },
+  { id: 's2b', t: '秘境 · 一间空屋', who: '屋里的桌子',
+    x: '屋子正中一张桌，桌上摆着算盘、账本、和一封没拆的信。算盘自己动了一下。',
+    opts: [
+      O('拆信', '信上写着「别拆」', { scroll: 3, stone: 80 }, { next: 's3b', egg: 'xin' }),
+      O('拨算盘', '算出了一笔从没记过的账', { stone: 200 }, { next: 's3a' }),
+      O('翻账本', '最后一页是你宗门的名字', { fame: 25, flag: 'mizhang' }, { next: 's3c' })
+    ] },
+  { id: 's2c', t: '秘境 · 黑着走', who: '前面有人',
+    x: '一点光都没有，只能摸着墙走。走了没多远，手指头碰到一个人的袖子——那人也在摸墙。',
+    opts: [
+      O('打招呼', '对方是来找门的，结个伴', { recruit: 1, loyalty: 3 }, { next: 's3a', egg: 'mohei' }),
+      O('不吭声，绕过去', '身后传来一句「谢谢」', { scroll: 2 }, { next: 's3b' }),
+      O('往回走', '门在背后，一推就开', { herb: 20 }, { next: 's3c' })
+    ] },
+  { id: 's3a', t: '秘境 · 尽头', who: '一口井',
+    x: '井里没有水，全是书。最上面那本摊着，写的正是你宗门今年发生的事，字还没干。',
+    opts: [
+      O('把书带走', '带出去就变成残卷', { scroll: 6, fame: 20 }, { egg: 'jingshu' }),
+      O('往后翻一页', '看了一眼，合上了', { grow: 0.15, fame: 10 }, { egg: 'houyeye' }),
+      O('把自己的事补两句', '编了句好听的', { fame: 30, scroll: 2 })
+    ] },
+  { id: 's3b', t: '秘境 · 尽头', who: '一个柜台',
+    x: '柜台后头没人，牌子上写「以物易物」。台面上摆着三样东西：一粒丹、一把剑、一张纸。',
+    opts: [
+      O('拿丹', '实在', { item: 'pojing', herb: 10 }),
+      O('拿剑', '称手', { item: 'feijian', ore: 10 }),
+      O('拿纸', '纸上就一个字：再来', { scroll: 4, secret: 1 }, { egg: 'zailai' })
+    ] },
+  { id: 's3c', t: '秘境 · 尽头', who: '一扇朝里开的门',
+    x: '这扇门得从里头拉开。门外有风，风里全是山下集市的味道：糖炒栗子、劣质香、还有人吵架。',
+    opts: [
+      O('拉开门出去', '回到山门口，天刚亮', { stone: 150, fame: 15 }, { egg: 'chumen' }),
+      O('先听听他们吵什么', '吵的是你宗门的丹价', { scroll: 2, stone: 60 }),
+      O('把门关上，再坐会儿', '难得清静', { qi: 150, loyalty: 2 })
+    ] }
+];
+S.SECRET_BY_ID = {};
+S.SECRETS.forEach(function (s) { S.SECRET_BY_ID[s.id] = s; });
+
+/* =========================================================
+ * 三、战斗文案（自动回合制，但读起来要有画面）
+ * ========================================================= */
+S.WAR = {
+  open: [
+    '双方在山门前站定，谁也没先动。',
+    '演武堂的钟敲了三下，人全到齐了。',
+    '对方把话撂在门口，弟子们把兵器横在胸前。',
+    '那天风很大，旗帜响得听不清人说话。'
+  ],
+  hit: [
+    '{a}一剑劈过去，{b}侧身让开，地砖裂了一道。',
+    '{a}没喊招式，直接冲了上去，{b}被撞退三步。',
+    '{a}抬手就是一下，{b}硬接，虎口裂了。',
+    '{a}绕到侧面，{b}回身慢了半拍。'
+  ],
+  crit: [
+    '{a}那一下全场都没看清，{b}的兵器已经飞出去了。',
+    '{a}只出一招，{b}当场坐下了。',
+    '有人后来说，那一瞬间山门的灯全晃了一下。'
+  ],
+  lose: [
+    '{a}撑了很久，还是先倒下了。',
+    '{a}被逼到台阶下，剑拄在地上没撒手。',
+    '{a}被人抬回来的，嘴里还念叨着「再来」。'
+  ],
+  winTail: [
+    '对方收了兵，走之前回头看了一眼山门的匾。',
+    '弟子们没欢呼，先去扶伤的。',
+    '这一仗之后，山下好一阵子没人来收保护费。'
+  ],
+  loseTail: [
+    '东西被搬走了一半，好在人还在。',
+    '匾被劈了一道，没人提重做。',
+    '第二天照常练功，只是没人说话。'
+  ],
+  oneHit: '{a}只出手一次。后面那一整场，都是别人收拾现场。'
+};
+
+/* =========================================================
+ * 四、结局（判定 + 小传）
+ * ========================================================= */
+S.ENDINGS = [
+  { k: 'feisheng', n: '有人飞升了', c: '#c8952f',
+    d: '弟子飞升，山门留在原地，匾还挂着。',
+    ep: '{name}走到那年，山上已经很久没打过仗了。{top}在一天早上把剑放下，说了句「我上去看看」，人就再没回来。弟子们照旧开门、扫地、炼丹，只是每逢那天会在论道台多摆一副碗筷。' },
+  { k: 'yitong', n: '天下第一宗', c: '#b8453a',
+    d: '九宗大比夺魁，山下再没人敢提「商量」两个字。',
+    ep: '九宗大比那年，{name}只派了{top}一个人。打完最后一场，对面把旗子卷了递过来。回去的路上没人说话，到山门口才发现，赵家那块旧牌子早被人擦干净了。' },
+  { k: 'fumi', n: '山门被平了', c: '#6b6b6b',
+    d: '人散了，匾劈了，地方还在。',
+    ep: '最后那一年来得很快。{name}没守住，弟子们各奔东西，有人走前把藏经阁的书分了，说留着总比烧了强。多年以后有人路过，只看见半截台阶和一块长满草的空地。' },
+  { k: 'yinshi', n: '关门过日子', c: '#5f8f78',
+    d: '不争了，把山门一关，谁也不见。',
+    ep: '{name}后来把上山的路封了，说不想再折腾。弟子们种田、炼丹、教小孩认字，猫生了一窝又一窝。外头改朝换代好几轮，山里连年号都是自己记的。' },
+  { k: 'chengmo', n: '成了别人嘴里的魔', c: '#9a3f6b',
+    d: '路走窄了，但走得极远。',
+    ep: '{name}到后来连自己人都不太敢直呼掌门。山下说书的把这几十年编成七段，段段吓人。只有老弟子记得，最初那间破殿里，大家一起分过一锅糊饭。' },
+  { k: 'fujia', n: '富得不像修仙的', c: '#b07a2c',
+    d: '打架一般，账本漂亮。',
+    ep: '{name}最后没成什么仙，倒是把铺子开遍了九个镇。钱三娘逢人就说自己眼光好。弟子们出门都穿得体面，只是演武堂常年空着，落了灰。' },
+  { k: 'pingdan', n: '就这么过下去了', c: '#7d8378',
+    d: '没有大起大落，也没散。',
+    ep: '{name}没什么可写进宗门志的大事。换过几任掌门，匾重做过两块，弟子来了一茬又一茬。那年翻旧账，发现米价涨了三倍，别的都还那样。' }
+];
+
+/* =========================================================
+ * 五、彩蛋（触发条件由引擎判定，这里存文案）
+ * ========================================================= */
+S.EGGS = {
+  jiangli:  ['讲了一炷香', '他真睡着了，还打了个呼。你也没舍得叫醒。'],
+  bian:     ['绳绑匾额', '那块匾用绳子挂了十一年，成了本门一景。'],
+  lunch:    ['轮流掌勺', '宗门志里郑重记下一笔：本月无人中毒。'],
+  jiadan:   ['假丹有效', '钱三娘后来承认，她往里掺了点真货。'],
+  zei:      ['送书的贼', '至今没人知道是谁，书倒是越送越勤。'],
+  yunshi:   ['摸石头的弟子', '他后来战力常年第一，理由写的是「不怕烫」。'],
+  saodi:    ['一炷香扫完院子', '那把扫帚被供到了藏经阁。'],
+  piao:     ['演武堂卖票', '票根还在，一张两文，卖了三十七张。'],
+  zhang:    ['烧账本', '从此账再没对不上过——因为没账了。'],
+  daiyi:    ['包袱放下了', '他没走，也没再提别处给多少。'],
+  mao:      ['巡山使', '它一天巡三次，两次在睡觉。'],
+  dunwu:    ['想通了又忘了', '有人把这句刻在了论道台背面。'],
+  daolv:    ['比一场', '打到最后两人笑场，架没打完。'],
+  mingzi:   ['刻在山门上', '后来名字越刻越多，匾都不够挂了。'],
+  yaba:     ['第一句话', '饭确实加了，他从此话也多了。'],
+  chaoshu:  ['抄书', '抄错三个字，反而悟出了新东西。'],
+  fan:      ['饭看起来香', '这条理由被写进了收徒标准。'],
+  tiezi:    ['裱起来的帖子', '赵无咎下回上山，看见自己写的字，脸黑了半天。'],
+  zhao_fan: ['一顿饭', '他说这顿记着，后来真还了。'],
+  xiaoman:  ['记账的小姑娘', '她把三十年的柴米油盐都记成了一笔一笔。'],
+  zhao_qian:['推回来的钱', '他在门口站了会儿，到底还是没拿。'],
+  zhangben: ['一页不差的账', '最后一页写着：清。'],
+  ziju:     ['字据', '两边都收好了，谁也没用上。'],
+  maoming:  ['冒名的分部', '撑了十一天，第十二天自己摘了牌。'],
+  liba:     ['加高的篱笆', '它跨过去的时候，一步都没停。'],
+  heijiao:  ['洞里的书', '全是账本，记着这座山几百年的租子。'],
+  jian:     ['那把剑', '至今没人认领，插在库房里当镇纸。'],
+  zhu:      ['两窝猪', '赔了钱，猪后来自己回来了。'],
+  lingdang: ['羊的铃铛', '挂在殿里，风一吹就响。'],
+  maishan:  ['不卖', '员外后来在别处修了坟，年年派人送帖子。'],
+  luzha:    ['先捡丹', '那弟子后来当上了丹房管事，规矩特别严。'],
+  hetong:   ['念合同', '第二页第三条写着：最终解释权归他。'],
+  dong:     ['洞里睡一觉', '他出来说梦见有人教了他一整夜。'],
+  she:      ['反借灵石', '钱三娘记账记了一辈子，这笔记在最前面。'],
+  dazibao:  ['更正启事', '两张纸并排贴了半年，成了镇上一景。'],
+  qiuyu:    ['两滴雨', '全镇都作证：确实下了。'],
+  zhaopai:  ['更大的招牌', '现在还挂着，比总门的阔气。'],
+  zhao_tan: ['老头出马', '他把拐杖往地上一杵，对面就不说话了。'],
+  qi:       ['输了一局', '讲的故事后来被说书先生抄了去。'],
+  mogu:     ['蘑菇箭头', '坡地上长着一片从没人种过的药草。'],
+  guancai:  ['一箱残卷', '抬棺材的人始终没找着。'],
+  zongmenzhi:['头一页', '就六个字，后人添了三百页注。'],
+  shuoshu:  ['上台讲真的', '没人信，但掌声挺响。'],
+  milu:     ['将错就错', '他半年后看见匾，愣了一下，然后没走。'],
+  pingdan:  ['没什么事的一年', '这一页是宗门志里最短的，也是被翻得最旧的。'],
+  'tushenme': ['坐到天亮', '谁也没答上来，但天亮之后谁都没走。'],
+  yingtui:  ['硬推门', '灯全灭了，倒也看清了路。'],
+  hua:      ['添上名字', '后来每一年，画里都多一个人。'],
+  xin:      ['别拆', '拆都拆了。'],
+  mohei:    ['摸黑结伴', '两个人一起找了半天门，出门才发现方向反了。'],
+  jingshu:  ['井里的书', '带出来那本，最后一页永远写不满。'],
+  houyeye:  ['往后翻一页', '看完之后，那人把书轻轻合上了。'],
+  zailai:   ['再来', '果然又来了一次。'],
+  chumen:   ['朝里开的门', '出去时天刚亮，山门口的弟子正在扫地。'],
+  lianming: ['连点山门名', '匾上的漆掉了一小块，露出底下一行更早的字。'],
+  wuxing:   ['五行齐全', '五个弟子站一排，谁也不服谁，倒也没打起来。'],
+  jiu:      ['一坛老酒', '喝完什么都没发生，但那天大家都很高兴。'],
+  maonian:  ['掌门百岁', '弟子偷偷摆了寿面，掌门装没看见。'],
+  guanmen:  ['关了三年山门', '再开门时，门口的草长到膝盖。'],
+  nianhao:  ['自己记年号', '第一年叫「开门」，一直用到最后。']
+};
+
+/* 每年可能冒出来的闲笔日志，让日志流不只有数字 */
+S.FLAVOR = [
+  '弟子寮的灯亮到很晚，有人在背口诀，背得磕磕巴巴。',
+  '猫把演武堂的木人当成了同类，蹲了一下午。',
+  '山下有人送来自家种的菜，没留名字。',
+  '灵田边的稻草人歪了，没人扶，第二天自己正了。',
+  '藏经阁拐角那页书被翻烂了，是讲怎么生火的。',
+  '演武堂早上有人练剑，剑风把晾的衣裳全吹到了树上。',
+  '丹房飘出糊味，弟子们已经见怪不怪。',
+  '值夜的弟子在墙上刻了一道，说记着日子。',
+  '后山的溪水今天特别响。',
+  '有人把「破山门」三个字练了一百遍，还是写得歪。',
+  '饭桌上多了一副碗筷，谁也没问是谁摆的。',
+  '论道台的台阶被磨得发亮。'
+];
+
+S.TIPS = [
+  '盖聚灵阵最划算，弟子修炼速度是全宗门的底子。',
+  '弟子寮不升级，招到天骄也只能睡柴房。',
+  '弟子每年都会自己涨修为，你不用盯着。',
+  '派任务要挑灵根：木灵根采药、金灵根挖矿，差挺多。',
+  '护山大阵不只防外敌，打输了少丢东西。',
+  '丹房和器坊得先盖出来，才能炼丹炼器。',
+  '藏经阁攒的残卷能换功法，也能换招募令。',
+  '声望够了自动升宗门等级，建筑上限跟着涨。',
+  '有些事件只在特定年份、盖了特定建筑之后才来。',
+  '看广告能补一次招募，一天最多三次。',
+  '传位之后，功法、图纸和历代名录会留下来。',
+  '同样的开局，走法编号也不会重样。'
+];
+
+module.exports = S;
+
+});
+__def('sect-engine', function (module, exports, __req) {
+/* 破山门 · 宗门经营引擎
+ * 纯逻辑，零 DOM / 零 wx / 零 window，小程序端与网页端共用同一份。
+ */
+var D = __req('sect-data');
+var T = __req('sect-story');
+
+var API = {};
+var UID = 1;
+
+/* ================= 基础工具 ================= */
+function hash(str) {
+  var h = 2166136261;
+  for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = (h * 16777619) >>> 0; }
+  return h >>> 0;
+}
+function rnd(S) {
+  S.rng = (S.rng * 1664525 + 1013904223) >>> 0;
+  return S.rng / 4294967296;
+}
+function ri(S, a, b) { return a + Math.floor(rnd(S) * (b - a + 1)); }
+function pick(S, arr) { return arr[Math.floor(rnd(S) * arr.length)]; }
+function weighted(S, arr, key) {
+  var tot = 0, i;
+  for (i = 0; i < arr.length; i++) tot += (key ? arr[i][key] : arr[i].w) || 1;
+  var r = rnd(S) * tot;
+  for (i = 0; i < arr.length; i++) {
+    r -= (key ? arr[i][key] : arr[i].w) || 1;
+    if (r <= 0) return arr[i];
+  }
+  return arr[arr.length - 1];
+}
+function merge(into, e) {
+  if (!e) return into;
+  for (var k in e) into[k] = (into[k] || 0) + e[k];
+  return into;
+}
+function fmtPct(p) {
+  if (p < 0.001) return '<0.1%';
+  if (p < 0.01) return (p * 100).toFixed(2) + '%';
+  return (p * 100).toFixed(1) + '%';
+}
+function log(S, x, k, tag) {
+  S.logs.push({ y: '第 ' + S.year + ' 年 · ' + S.name, k: k || 'plain', x: x, tag: tag || '' });
+  if (S.logs.length > 260) S.logs.splice(0, S.logs.length - 260);
+}
+function resStr(e) {
+  var p = [], N = { stone: '灵石', herb: '药材', ore: '矿石', fame: '声望', scroll: '残卷', qi: '修为' };
+  for (var k in N) if (e[k]) p.push((e[k] > 0 ? '+' : '') + e[k] + ' ' + N[k]);
+  return p.join('，');
+}
+
+/* ================= 创建 / 开局 ================= */
+API.create = function (seed) {
+  var S = {
+    ver: D.VER, rng: (seed || Date.now()) >>> 0,
+    created: false, over: false, name: '破山门', path: '', master: '', partner: 'none',
+    year: 1, gen: 1, fame: 0, stone: 0, herb: 0, ore: 0, scroll: 0,
+    ap: 3, apMax: 3, buildings: {}, items: {}, disciples: [],
+    flags: {}, eggs: [], ach: [], logs: [], pending: null, war: null, result: null,
+    ad: { day: '', used: 0 }, lastSeen: 0, offline: null,
+    legacy: { scroll: 0, blueprints: [], roster: [], gens: [] },
+    stat: { recruits: 0, wins: 0, loses: 0, streak: 0, crafts: 0, tasks: {}, choices: {}, acts: {}, eggsAll: {}, maxFame: 0, maxStone: 0, deaths: 0, transfers: 0 },
+    titleTaps: 0, closedYears: 0, lastEventId: '', evSeen: {}
+  };
+  D.BUILDINGS.forEach(function (b) { S.buildings[b.k] = 0; });
+  D.ITEMS.forEach(function (it) { S.items[it.k] = 0; });
+  S.buildings.hall = 1;
+  S.buildings.dorm = 1;
+  return S;
+};
+
+function realmOf(qi) {
+  var r = 0;
+  for (var i = 0; i < D.REALMS.length; i++) if (qi >= D.REALMS[i].need) r = i;
+  return r;
+}
+function realmName(qi) { return D.REALMS[realmOf(qi)].n; }
+API.realmOf = realmOf;
+
+function pathOf(S) {
+  for (var i = 0; i < D.PATHS.length; i++) if (D.PATHS[i].k === S.path) return D.PATHS[i];
+  return D.PATHS[2];
+}
+function masterOf(S) {
+  for (var i = 0; i < D.MASTERS.length; i++) if (D.MASTERS[i].k === S.master) return D.MASTERS[i];
+  return D.MASTERS[0];
+}
+function partnerOf(S) {
+  for (var i = 0; i < D.PARTNERS.length; i++) if (D.PARTNERS[i].k === S.partner) return D.PARTNERS[i];
+  return D.PARTNERS[4];
+}
+function levelOf(S) {
+  var lv = 0;
+  for (var i = 0; i < D.LEVELS.length; i++) if (S.fame >= D.LEVELS[i].need) lv = i;
+  return lv;
+}
+function capOf(S) { return 3 + S.buildings.dorm * 3; }
+function apMaxOf(S) { return 3 + Math.floor(S.buildings.hall / 2); }
+
+function achAdd(S, k) {
+  if (S.ach.indexOf(k) >= 0) return null;
+  var a = null;
+  for (var i = 0; i < D.ACH.length; i++) if (D.ACH[i].k === k) a = D.ACH[i];
+  if (!a) return null;
+  S.ach.push(k);
+  log(S, '【成就】' + a.n + ' · ' + a.d, 'good', '成就');
+  return a;
+}
+function eggAdd(S, k) {
+  if (!T.EGGS[k] || S.eggs.indexOf(k) >= 0) return false;
+  S.eggs.push(k);
+  S.stat.eggsAll[k] = (S.stat.eggsAll[k] || 0) + 1;
+  log(S, '【彩蛋】' + T.EGGS[k][0] + '：' + T.EGGS[k][1], 'egg', '彩蛋');
+  if (S.eggs.length >= 3) achAdd(S, 'egg3');
+  if (S.eggs.length >= 8) achAdd(S, 'egg8');
+  return true;
+}
+
+/* ================= 弟子 ================= */
+function makeName(S) {
+  var a = pick(S, D.SURNAMES), b = pick(S, D.GIVEN1);
+  if (rnd(S) < 0.24) b += pick(S, D.GIVEN2);
+  return a + b;
+}
+function makeDisciple(S, opt) {
+  opt = opt || {};
+  var qPool = D.QUALITY.slice();
+  var lib = S.buildings.library || 0;
+  var partner = partnerOf(S);
+  var talentBoost = (partner.per && partner.per.talent) || 1;
+  var q = weighted(S, qPool, 'w');
+  // 藏经阁 / 道侣 / 宗门等级会略微抬高好资质的概率
+  if (rnd(S) < (lib * 0.012 + levelOf(S) * 0.008 + (talentBoost - 1) * 0.1)) {
+    var qi = D.QUALITY.indexOf(q);
+    if (qi < D.QUALITY.length - 1) q = D.QUALITY[qi + 1];
+  }
+  var root = weighted(S, [
+    { k: 'jin', w: 20 }, { k: 'mu', w: 20 }, { k: 'shui', w: 20 },
+    { k: 'huo', w: 20 }, { k: 'tu', w: 20 }, { k: 'lei', w: 2.5 }, { k: 'bing', w: 2.5 }
+  ], 'w').k;
+  var trait = pick(S, D.TRAITS);
+  var talent = rnd(S) < (0.34 * talentBoost) ? pick(S, D.TALENTS).k : '';
+  var age = ri(S, 12, 27);
+  var d = {
+    uid: UID++, name: opt.name || makeName(S), root: root, q: q.k, trait: trait.k,
+    talent: talent, age: age, qi: opt.qi || 0, realm: 0,
+    loyalty: 55 + (trait.loyalty || 0) + ri(S, -8, 8),
+    status: 'ok', gear: '', gongfa: '', grow: 0, guard: 0,
+    lifeBonus: 0, upPill: 0, save: 0, join: S.year, win: 0, cameo: opt.cameo || ''
+  };
+  d.realm = realmOf(d.qi);
+  return d;
+}
+function rootOf(k) { for (var i = 0; i < D.ROOTS.length; i++) if (D.ROOTS[i].k === k) return D.ROOTS[i]; return D.ROOTS[0]; }
+function qualOf(k) { for (var i = 0; i < D.QUALITY.length; i++) if (D.QUALITY[i].k === k) return D.QUALITY[i]; return D.QUALITY[0]; }
+function traitOf(k) { for (var i = 0; i < D.TRAITS.length; i++) if (D.TRAITS[i].k === k) return D.TRAITS[i]; return D.TRAITS[0]; }
+function talentOf(k) { for (var i = 0; i < D.TALENTS.length; i++) if (D.TALENTS[i].k === k) return D.TALENTS[i]; return null; }
+function liveDisciples(S) { return S.disciples.filter(function (d) { return d.status !== 'gone' && d.status !== 'dead'; }); }
+
+function powerOf(S, d) {
+  var q = qualOf(d.q), r = D.REALMS[d.realm];
+  var p = r.power * (0.55 + q.mul * 0.45);
+  var m = masterOf(S).per, pa = pathOf(S).per, pp = partnerOf(S).per;
+  p *= (1 + (S.buildings.arena || 0) * 0.08);
+  p *= (1 + (d.grow || 0));
+  p *= (m.power || 1) * (pa.power || 1) * (pp.power || 1);
+  if (d.gear === 'feijian') p *= 1.25;
+  if (d.trait === 'mang') p *= 1.1;
+  if (d.trait === 'ao') p *= (q.star >= 4 ? 1.15 : 0.9);
+  if (d.status === 'hurt') p *= 0.6;
+  if (d.talent === 'zao' && d.age < 20) p *= 1.3;
+  if (d.talent === 'jian') p *= 1.35;
+  return Math.round(p);
+}
+API.powerOf = powerOf;
+
+function growOf(S, d) {
+  var q = qualOf(d.q), t = traitOf(d.trait);
+  var g = (11 + d.realm * 5.5) * q.mul * t.grow;
+  g *= 1 + (S.buildings.array || 0) * 0.12 + (masterOf(S).per.grow || 0) + (d.grow || 0) + (pathOf(S).per.grow || 0);
+  if (d.talent === 'fan' && d.age >= 40) g *= 3;
+  if (d.talent === 'zao' && d.age < 20) g *= 1.8;
+  if (d.talent === 'lan') g *= 0.8;
+  if (d.talent === 'meng') g *= 1.35;
+  if (d.talent === 'ku' && d.status === 'closed') g *= 3;
+  if (d.talent === 'zao' && d.realm > 4) g *= 0.85;
+  if (d.status === 'hurt') g *= 0.5;
+  if (d.gongfa) g *= 1.3;
+  return Math.round(g * 10) / 10;
+}
+
+function tryBreak(S, d, out) {
+  if (d.realm >= D.REALMS.length - 1) return;
+  var need = D.REALMS[d.realm + 1].need;
+  if (d.qi < need) return;
+  var p = D.REALMS[d.realm].up;
+  p += (d.upPill ? 1 : 0) + (S.buildings.library || 0) * 0.012 + (d.talent === 'fu' ? 0.05 : 0);
+  p += (masterOf(S).per.up || 0);
+  var ok = d.upPill > 0 || rnd(S) < p;
+  d.upPill = 0;
+  if (ok) {
+    d.realm++;
+    log(S, d.name + ' 破入【' + D.REALMS[d.realm].n + '】。', 'good', '突破');
+    out.breaks.push(d.name + '→' + D.REALMS[d.realm].n);
+    if (d.realm === 2) achAdd(S, 'jin');
+    if (d.realm >= 9) { achAdd(S, 'fei'); out.feisheng = d.name; }
+    if (d.talent === 'fu') {
+      liveDisciples(S).forEach(function (x) { if (x.uid !== d.uid) x.qi += 20; });
+    }
+  } else {
+    d.qi = Math.max(D.REALMS[d.realm].need, Math.round(d.qi * 0.86));
+    log(S, d.name + ' 冲关没成，修为退了一截。', 'bad', '突破');
+    if (rnd(S) < 0.18) d.status = 'hurt';
+  }
+}
+
+/* ================= 资源 / 效果 ================= */
+function applyEff(S, e, out) {
+  if (!e) return;
+  var pa = pathOf(S).per;
+  ['stone', 'herb', 'ore', 'fame', 'scroll'].forEach(function (k) {
+    if (!e[k]) return;
+    var v = e[k];
+    if (k === 'stone' && v > 0) v = Math.round(v * (pa.stone || 1));
+    if (k === 'fame' && v > 0) v = Math.round(v * (pa.fame || 1));
+    S[k] = Math.max(0, S[k] + v);
+  });
+  if (e.qi) liveDisciples(S).forEach(function (d) { d.qi += e.qi; });
+  if (e.grow) liveDisciples(S).forEach(function (d) { d.grow = (d.grow || 0) + e.grow; });
+  if (e.loyalty) liveDisciples(S).forEach(function (d) { d.loyalty = Math.max(0, Math.min(100, d.loyalty + e.loyalty)); });
+  if (e.power) liveDisciples(S).forEach(function (d) { d.grow = (d.grow || 0) + e.power; });
+  if (e.recruit) { for (var i = 0; i < e.recruit; i++) recruitOne(S, out, true); }
+  if (e.item) { S.items[e.item] = (S.items[e.item] || 0) + 1; log(S, '得到【' + (D.ITEM_BY_K[e.item] ? D.ITEM_BY_K[e.item].n : e.item) + '】。', 'good', '道具'); }
+  if (e.hurt) hurtOne(S, out);
+  if (e.war) startWar(S, out, e.war);
+  if (e.egg) eggAdd(S, e.egg);
+  if (e.flag) S.flags[e.flag] = true;
+  // next 与 secret 只走一条，避免同一次抉择开两道门
+  if (e.next) startSecret(S, out, e.next);
+  else if (e.secret) startSecret(S, out, 's1');
+  if (out) out.res = resStr(e);
+}
+
+function recruitOne(S, out, free) {
+  var cap = capOf(S);
+  if (liveDisciples(S).length >= cap) {
+    if (!free) log(S, '弟子寮住满了（' + cap + ' 人），先盖寮。', 'bad', '招募');
+    return null;
+  }
+  var d = makeDisciple(S);
+  S.disciples.push(d);
+  S.stat.recruits++;
+  log(S, '新弟子 ' + d.name + ' 入门：' + qualOf(d.q).n + ' · ' + rootOf(d.root).n + '灵根 · ' + traitOf(d.trait).n +
+    (d.talent ? ' · 隐藏天赋【' + talentOf(d.talent).n + '】' : ''), d.q === 'yao' || d.q === 'jiao' ? 'good' : 'plain', '招募');
+  if (d.q === 'jiao') achAdd(S, 'jiao');
+  if (d.q === 'yao') achAdd(S, 'yao');
+  if (S.stat.recruits === 1) achAdd(S, 'first');
+  if (liveDisciples(S).length >= 10) achAdd(S, 'ten');
+  if (out && out.newbies) out.newbies.push(d.name);
+  return d;
+}
+API.recruitOne = recruitOne;
+
+function hurtOne(S, out) {
+  var ds = liveDisciples(S).filter(function (d) { return d.status !== 'hurt'; });
+  if (!ds.length) return;
+  var d = pick(S, ds);
+  var hard = rnd(S) < 0.14;
+  if (d.talent === 'shou' || d.gear === 'jing' || d.save > 0) {
+    d.save = 0;
+    log(S, d.name + ' 眼看要出事，硬是挺过来了。', 'good', '伤情');
+    return;
+  }
+  if (hard) {
+    if (partnerOf(S).per.heal && rnd(S) < 0.55) {
+      log(S, d.name + ' 重伤，被 ' + partnerOf(S).n + ' 救了回来。', 'good', '伤情');
+      achAdd(S, 'jiu');
+      return;
+    }
+    d.status = 'dead';
+    S.stat.deaths++;
+    log(S, d.name + ' 没能回来。', 'bad', '伤亡');
+  } else {
+    d.status = 'hurt';
+    log(S, d.name + ' 挂了彩，得养一阵。', 'bad', '伤情');
+    if (d.talent === 'ai') d.qi += 180;
+  }
+}
+
+/* ================= 宗门战 ================= */
+function warTeam(S, n) {
+  var ds = liveDisciples(S).slice().sort(function (a, b) { return powerOf(S, b) - powerOf(S, a); });
+  return ds.slice(0, n || Math.min(5, ds.length));
+}
+function startWar(S, out, key) {
+  var enemies = D.ENEMIES.filter(function (e) { return e.minLv <= levelOf(S); });
+  var en = null;
+  if (key === 'chi1') { en = { n: '赵无咎', d: '他连剑都没带。', power: 200 + levelOf(S) * 130, gain: { fame: 45, stone: 100 } }; }
+  else if (key === 'chi2') { en = { n: '围山的那些人', d: '看不清旗号。', power: 480 + levelOf(S) * 200, gain: { fame: 90, stone: 200, scroll: 2 } }; }
+  else en = pick(S, enemies);
+  if (!en) en = D.ENEMIES[0];
+  var team = warTeam(S, 5);
+  var mine = 0;
+  team.forEach(function (d) { mine += powerOf(S, d); });
+  var ward = 1 + (S.buildings.ward || 0) * 0.15;
+  var zhenpan = S.items.zhenpan > 0 ? 1.12 : 1;
+  var pa = pathOf(S).per.power || 1;
+  mine = Math.round(mine * ward * zhenpan * pa * (partnerOf(S).per.power || 1));
+  if (S.items.zhenpan > 0) S.items.zhenpan--;
+  var ratio = mine / Math.max(1, en.power);
+  var pWin = 1 / (1 + Math.exp(-(Math.log(Math.max(0.05, ratio)) * 2.1)));
+  pWin = Math.max(0.05, Math.min(0.95, pWin));
+  var win = rnd(S) < pWin;
+  var lines = [];
+  lines.push(pick(S, T.WAR.open));
+  var cap = Math.min(4, Math.max(2, team.length));
+  for (var i = 0; i < cap; i++) {
+    var a = team[i % Math.max(1, team.length)];
+    if (!a) break;
+    var tmpl;
+    if (a.talent === 'jian' && i === 0) tmpl = T.WAR.oneHit;
+    else if (win && rnd(S) < 0.35) tmpl = pick(S, T.WAR.crit);
+    else tmpl = pick(S, win ? T.WAR.hit : (rnd(S) < 0.5 ? T.WAR.hit : T.WAR.lose));
+    lines.push(tmpl.split('{a}').join(a.name).split('{b}').join(en.n));
+  }
+  lines.push(pick(S, win ? T.WAR.winTail : T.WAR.loseTail));
+  if (win) {
+    applyEff(S, en.gain, out);
+    S.stat.wins++; S.stat.streak++;
+    if (S.stat.streak >= 5) achAdd(S, 'win');
+    if (ratio < 0.8) achAdd(S, 'beat');
+    log(S, '【' + en.n + '】打赢了。' + resStr(en.gain), 'good', '宗门战');
+    team.forEach(function (d) { d.win++; d.qi += 30; });
+  } else {
+    S.stat.loses++; S.stat.streak = 0;
+    var loss = { stone: -Math.min(S.stone, Math.round(90 + levelOf(S) * 40)), fame: -8 };
+    applyEff(S, loss, out);
+    var hurtN = 1 + (rnd(S) < 0.4 ? 1 : 0);
+    for (var j = 0; j < hurtN; j++) hurtOne(S, out);
+    log(S, '【' + en.n + '】没打过。' + resStr(loss), 'bad', '宗门战');
+  }
+  S.war = { title: en.n, win: win, mine: mine, foe: en.power, lines: lines, gain: win ? resStr(en.gain) : '折了些东西和人' };
+  if (out) out.war = S.war;
+  // 输太惨可能直接被平了
+  if (!win && mine < en.power * 0.18 && levelOf(S) >= 2 && rnd(S) < 0.18) S.flags.mie = true;
+  return S.war;
+}
+
+/* ================= 事件 / 秘境 ================= */
+function eventOk(S, ev) {
+  var c = ev.cond || {};
+  if (c.minYear && S.year < c.minYear) return false;
+  if (c.reqFlag && !S.flags[c.reqFlag]) return false;
+  if (c.noFlag && S.flags[c.noFlag]) return false;
+  if (c.needBuild && !S.buildings[c.needBuild]) return false;
+  if (c.minLv && levelOf(S) < c.minLv) return false;
+  if (ev.id === S.lastEventId) return false;
+  var seen = S.evSeen[ev.id] || 0;
+  if (seen >= 2) return false;
+  return true;
+}
+function raise(S, ev, out, from) {
+  S.pending = {
+    from: from || 'event', id: ev.id, t: ev.t, who: ev.who, x: ev.x, tag: ev.tag,
+    opts: ev.opts.map(function (o, i) {
+      var pop = popOf(S, ev.id, i, ev.opts.length);
+      return { n: o.n, d: o.d, pop: pop };
+    }),
+    _raw: ev.opts
+  };
+  S.lastEventId = ev.id;
+  S.evSeen[ev.id] = (S.evSeen[ev.id] || 0) + 1;
+  log(S, '【' + ev.t + '】' + ev.x, 'event', ev.tag);
+  if (out) out.pending = true;
+}
+function popOf(S, eid, idx, n) {
+  var key = eid + '#' + idx;
+  var local = (S.stat.choices[key] || 0) + ((API.globalChoices && API.globalChoices[key]) || 0);
+  var base = (D.POP.opts[idx] || (1 / n)) * 100;
+  if (local > 0) base = base * 0.55 + (local / Math.max(1, local + 6)) * 45;
+  return Math.max(2, Math.round(base));
+}
+function findEvent(S) {
+  var pool = T.EVENTS.filter(function (e) { return eventOk(S, e); });
+  if (!pool.length) return null;
+  return weighted(S, pool, 'w');
+}
+function startSecret(S, out, id) {
+  S.stat.secretRuns = (S.stat.secretRuns || 0) + 1;
+  var sc = T.SECRET_BY_ID[id || 's1'];
+  // 一世最多进 8 次秘境，防止「再来」这类回环把抉择刷成死循环
+  if (!sc || S.stat.secretRuns > 8) {
+    S.scroll += 2;
+    log(S, '那道门今天不开了，藏经阁倒多了两卷残卷。', 'plain', '秘境');
+    if (out) out.secret = false;
+    return;
+  }
+  raise(S, sc, out, 'secret');
+  if (out) out.secret = true;
+}
+
+function choose(S, idx, out) {
+  if (!S.pending) return { ok: false, msg: '眼下没有要拿主意的事。' };
+  var p = S.pending, raw = p._raw[idx] || p._raw[0];
+  var key = p.id + '#' + idx;
+  S.stat.choices[key] = (S.stat.choices[key] || 0) + 1;
+  if (API.globalChoices) API.globalChoices[key] = (API.globalChoices[key] || 0) + 1;
+  var e = JSON.parse(JSON.stringify(raw.e || {}));
+  // 有风险标记的选项，可能翻车
+  if (raw.risk && rnd(S) < raw.risk) {
+    e = { stone: -40, fame: -6 };
+    log(S, '这事没办利索。', 'bad', '抉择');
+  }
+  if (raw.next) e.next = raw.next;
+  if (raw.egg) e.egg = raw.egg;
+  if (raw.flag) e.flag = raw.flag;
+  if (raw.war) e.war = raw.war;
+  S.pending = null;
+  log(S, '你选了：' + raw.n + (resStr(e) ? '　（' + resStr(e) + '）' : ''), 'choice', '抉择');
+  applyEff(S, e, out);
+  if (out) out.chosen = raw.n;
+  return { ok: true };
+}
+
+/* ================= 年度结算 ================= */
+function yearEnd(S, out) {
+  var i, d;
+  var pa = pathOf(S).per, ma = masterOf(S).per, pp = partnerOf(S).per;
+
+  /* 建筑产出 */
+  var inc = { stone: 0, herb: 0, ore: 0, fame: 0, scroll: 0 };
+  D.BUILDINGS.forEach(function (b) {
+    var lv = S.buildings[b.k] || 0;
+    if (!lv || !b.out) return;
+    for (var k in b.out) {
+      var v = b.out[k] * lv;
+      if (k === 'herb' && ma.herb) v *= ma.herb;
+      if (k === 'fame') v *= (pa.fame || 1);
+      inc[k] = (inc[k] || 0) + v;
+    }
+  });
+  inc.stone += 24 + liveDisciples(S).length * 4;   // 弟子下山做点零活
+  inc.stone += pp.stone || 0;
+  inc.scroll += ma.scroll || 0;
+  // 商道加成
+  if (pa.trade) inc.stone = Math.round(inc.stone * pa.trade);
+  // 会算账 / 道侣
+  var suan = liveDisciples(S).some(function (x) { return x.talent === 'suan'; });
+  var outgo = Math.round((liveDisciples(S).length * 3 + Object.keys(S.buildings).reduce(function (a, k) { return a + S.buildings[k]; }, 0) * 2) * (suan ? 0.8 : 1));
+  inc.stone -= outgo;
+
+  for (var k in inc) {
+    if (k === 'scroll') S.scroll = Math.round((S.scroll + inc[k]) * 10) / 10;
+    else S[k] = Math.max(0, Math.round(S[k] + inc[k]));
+  }
+  S.scroll = Math.floor(S.scroll * 10) / 10;
+  if (inc.stone < 0) log(S, '今年入不敷出，账房把算盘拨得劈啪响。', 'bad', '账目');
+
+  /* 弟子修炼 */
+  var ds = liveDisciples(S);
+  for (i = 0; i < ds.length; i++) {
+    d = ds[i];
+    d.age++;
+    if (d.status === 'hurt' && rnd(S) < (0.45 + (pp.heal || 0) * 0.08)) d.status = 'ok';
+    d.qi += growOf(S, d);
+    if (d.talent === 'yun' && rnd(S) < 0.3) S.stone += ri(S, 15, 45);
+    if (d.talent === 'tou' && rnd(S) < 0.12) {
+      if (rnd(S) < 0.4) { S.stone += ri(S, 30, 90); S.scroll += 1; log(S, d.name + ' 从外头顺了点东西回来，你决定不深究。', 'egg', '弟子'); }
+      else S.stone = Math.max(0, S.stone - ri(S, 10, 35));
+    }
+    if (d.talent === 'zui' && rnd(S) < 0.06) { d.grow = (d.grow || 0) + 0.25; log(S, d.name + ' 喝多了，第二天忽然想通一门功法。', 'good', '弟子'); }
+    if (d.talent === 'cang' && d.age === 30 && qualOf(d.q).star <= 2) {
+      d.q = 'jue'; log(S, d.name + ' 藏了三十年，今天露了一手，全宗门都愣了。', 'good', '弟子');
+    }
+    tryBreak(S, d, out);
+
+    // 寿命
+    var life = D.REALMS[d.realm].life + d.lifeBonus + (pp.life || 0);
+    if (d.age > life && rnd(S) < 0.28) {
+      d.status = 'dead';
+      log(S, d.name + ' 坐化了，' + D.REALMS[d.realm].n + '，享年 ' + d.age + '。', 'plain', '弟子');
+    }
+    // 忠诚 / 叛门
+    var loy = d.loyalty + (pa.loyalty || 0);
+    if (d.talent === 'ni' && d.realm >= 5) loy -= 8;
+    if (d.trait === 'hua' && rnd(S) < 0.05) loy -= 12;
+    if (loy < 18 && rnd(S) < 0.12) {
+      d.status = 'gone';
+      log(S, d.name + ' 卷了铺盖下山了，桌上留了张条。', 'bad', '弟子');
+      S.flags.pan = true;
+      achAdd(S, 'luan');
+    }
+    d.loyalty = Math.max(0, Math.min(100, loy));
+  }
+
+  /* 宗门等级 */
+  var newLv = levelOf(S);
+  if (newLv > (S._lv || 0)) {
+    log(S, '声望够了，外头开始管这儿叫【' + D.LEVELS[newLv].n + '】。', 'good', '升格');
+    if (newLv >= 3) achAdd(S, 'lv3');
+    if (newLv >= 6) achAdd(S, 'lv6');
+    if (out) out.levelUp = D.LEVELS[newLv].n;
+  }
+  S._lv = newLv;
+
+  /* 成就检查 */
+  if (S.stone >= 5000) achAdd(S, 'fu');
+  if (S.fame > S.stat.maxFame) S.stat.maxFame = S.fame;
+  if (S.stone > S.stat.maxStone) S.stat.maxStone = S.stone;
+  var builtAll = D.BUILDINGS.every(function (b) { return S.buildings[b.k] > 0; });
+  if (builtAll) achAdd(S, 'allbuild');
+  var roots = {}; liveDisciples(S).forEach(function (x) { roots[x.root] = 1; });
+  if (['jin', 'mu', 'shui', 'huo', 'tu'].every(function (r) { return roots[r]; })) {
+    achAdd(S, 'wuxing'); eggAdd(S, 'wuxing');
+  }
+  if (Object.keys(S.stat.tasks).length >= 6) achAdd(S, 'pai');
+
+  /* 闲笔 */
+  if (rnd(S) < 0.55) log(S, pick(S, T.FLAVOR), 'plain', '');
+
+  /* 彩蛋：关山门 / 自记年号 */
+  if (S.closedYears >= 3) eggAdd(S, 'guanmen');
+  if (S.year >= 60 && !S.flags.nianhao) { S.flags.nianhao = true; eggAdd(S, 'nianhao'); }
+
+  /* 人丁：声望起来了，会有人自己找上门 */
+  if (rnd(S) < 0.14 + levelOf(S) * 0.035 && liveDisciples(S).length < capOf(S)) {
+    var nd = recruitOne(S, out, true);
+    if (nd) log(S, nd.name + ' 自己找上山门来了，说听人提过这儿。', 'plain', '投奔');
+  }
+
+  /* 剧情事件 */
+  if (!S.pending && rnd(S) < 0.34) {
+    var ev = findEvent(S);
+    if (ev) raise(S, ev, out);
+  }
+  /* 外敌：每 5 年一次，等级越高越容易来 */
+  if (!S.pending && S.year % 5 === 0 && S.year >= 5) {
+    if (rnd(S) < 0.62) startWar(S, out);
+  }
+
+  /* 结局检查 */
+  if (out.feisheng) return endGame(S, 'feisheng', out);
+  if (S.flags.mie || (liveDisciples(S).length === 0 && S.year > 45 && S.stone < 80)) return endGame(S, 'fumi', out);
+  if (S.year >= 120) return endGame(S, null, out);
+}
+
+function endGame(S, force, out) {
+  var k = force;
+  if (!k) {
+    var lv = levelOf(S), ds = liveDisciples(S);
+    var topRealm = ds.reduce(function (a, d) { return Math.max(a, d.realm); }, 0);
+    var acts = S.stat.acts || {}, tasks = S.stat.tasks || {};
+    if ((topRealm >= 9 && S.stat.maxFame >= 5000) || (S.stat.maxFame >= 10000 && S.stat.wins >= 10)) k = 'feisheng';
+    else if ((lv >= 5 && S.stat.wins >= 7) || (S.stat.wins >= 10 && lv >= 4)) k = 'yitong';
+    else if (S.path === 'mo' && (lv >= 3 || S.stat.wins >= 6 || (tasks.ti || 0) >= 3)) k = 'chengmo';
+    else if (S.stat.maxStone >= 2600 || (S.path === 'shang' && S.stone >= 900)) k = 'fujia';
+    else if ((acts.close || 0) >= 3 || S.closedYears >= 3 || (S.stat.wins + S.stat.loses) <= 1) k = 'yinshi';
+    else if (lv <= 1 && S.stat.loses > S.stat.wins + 2) k = 'fumi';
+    else k = 'pingdan';
+  }
+  var def = null;
+  for (var i = 0; i < T.ENDINGS.length; i++) if (T.ENDINGS[i].k === k) def = T.ENDINGS[i];
+  if (!def) def = T.ENDINGS[6];
+  var ds2 = liveDisciples(S).slice().sort(function (a, b) { return b.qi - a.qi; });
+  var top = ds2.length ? ds2[0].name : '没人';
+  var ep = def.ep.split('{name}').join(S.name).split('{top}').join(top);
+  var p = (D.POP.ending[def.k] || 0.15) * (D.POP.path[S.path] || 0.25) * 5.2;
+  p *= Math.pow(0.9, Math.min(10, S.eggs.length));
+  p *= Math.pow(0.94, Math.min(10, Object.keys(S.flags).length));
+  p *= Math.pow(0.95, Math.min(8, S.stat.wins));
+  var flavor = 0.55 + (hash(JSON.stringify(S.stat.choices) + S.stat.recruits + S.gen + S.eggs.length + S.year) % 1000) / 1100;
+  p *= flavor;
+  var matchPct = fmtPct(Math.max(0.0001, Math.min(0.94, p)));
+  var comboId = (hash([S.path, S.master, S.partner, JSON.stringify(S.buildings), JSON.stringify(S.stat.choices),
+    JSON.stringify(S.stat.acts), S.stat.recruits, S.stat.wins, S.eggs.length, S.gen, S.year, def.k].join('|')) % 90000) + 10000;
+  // 选择口味：这一世更爱第几档
+  var cc = [0, 0, 0];
+  for (var ck3 in S.stat.choices) {
+    var oi3 = parseInt(ck3.split('#')[1], 10);
+    if (oi3 >= 0 && oi3 < 3) cc[oi3] += S.stat.choices[ck3];
+  }
+  var mx = 0;
+  for (var z3 = 1; z3 < 3; z3++) if (cc[z3] > cc[mx]) mx = z3;
+  var style = ['求稳派', '折中派', '整活派'][mx] + '（稳 ' + cc[0] + ' / 中 ' + cc[1] + ' / 野 ' + cc[2] + ' 次）';
+  // 全服最冷门的那一档，你碰过没有
+  var rarest = '没碰上';
+  var best = 101, rareName = '', rareHits = 0;
+  var allEv = T.EVENTS.concat(T.SECRETS);
+  for (var ck in S.stat.choices) {
+    var seg = ck.split('#'), eid = seg[0], oi = parseInt(seg[1], 10);
+    for (var ei = 0; ei < allEv.length; ei++) {
+      var ev = allEv[ei];
+      if (ev.id !== eid || !ev.opts[oi]) continue;
+      var pv = Math.round((D.POP.opts[oi] !== undefined ? D.POP.opts[oi] : (1 / ev.opts.length)) * 100);
+      if (pv < best) { best = pv; rareName = ev.opts[oi].n; rareHits = S.stat.choices[ck]; }
+    }
+  }
+  if (rareName) rarest = rareName + '（这一档全服 ' + best + '% 会这么选，你点了 ' + rareHits + ' 次）';
+  var route = [pathOf(S).tag, masterOf(S).n.split(' · ')[0], (S.stat.wins >= S.stat.loses ? '能打' : '能忍'),
+    (S.eggs.length >= 5 ? '好事之徒' : '老实人')].join(' · ');
+  S.result = {
+    k: def.k, n: def.n, c: def.c, d: def.d, ep: ep,
+    years: S.year, gen: S.gen, level: D.LEVELS[levelOf(S)].n,
+    fame: S.fame, stone: S.stone, disciples: S.disciples.length,
+    alive: liveDisciples(S).length, wins: S.stat.wins, loses: S.stat.loses,
+    eggs: S.eggs.length, ach: S.ach.length,
+    matchPct: matchPct, comboId: comboId, route: route, rarest: rarest, style: style,
+    top: top, topRealm: ds2.length ? D.REALMS[ds2[0].realm].n : '-',
+    roster: ds2.slice(0, 6).map(function (d) {
+      return { n: d.name, q: qualOf(d.q).n, root: rootOf(d.root).n, realm: D.REALMS[d.realm].n, power: powerOf(S, d) };
+    }),
+    eggsList: S.eggs.map(function (e) { return T.EGGS[e] ? T.EGGS[e][0] : e; })
+  };
+  S.over = true;
+  log(S, '—— 这一世到此为止 ——', 'good', '结局');
+  if (out) out.end = def.n;
+  return S.result;
+}
+
+/* ================= 动作 ================= */
+function buildCost(S, k) {
+  var b = D.BUILD_BY_K[k], lv = S.buildings[k] || 0;
+  var mul = Math.pow(1.65, lv);
+  return { stone: Math.round(b.cost.stone * mul), ore: Math.round(b.cost.ore * mul) };
+}
+API.buildCost = buildCost;
+
+API.act = function (S, type, p) {
+  p = p || {};
+  var out = { ok: true, msg: '', newbies: [], breaks: [], res: '' };
+  if (S.over && ['restart', 'transfer', 'none'].indexOf(type) < 0) return { ok: false, msg: '这一世已经收尾了。' };
+
+  switch (type) {
+    /* ---- 开局 ---- */
+    case 'setup': {
+      if (S.created) return { ok: false, msg: '宗门已经开张了。' };
+      var path = null;
+      D.PATHS.forEach(function (x) { if (x.k === p.path) path = x; });
+      if (!path) return { ok: false, msg: '先挑一条路。' };
+      S.path = p.path;
+      S.master = p.master || 'jian';
+      S.partner = p.partner || 'none';
+      S.name = (p.name || '破山门').toString().slice(0, 8);
+      S.stone = path.start.stone; S.herb = path.start.herb;
+      S.ore = path.start.ore; S.scroll = path.start.scroll; S.fame = path.start.fame;
+      S.created = true;
+      // 传位继承
+      if (S.legacy.scroll) { S.scroll += S.legacy.scroll; log(S, '历代掌门留下 ' + S.legacy.scroll + ' 卷残卷，一并接了过来。', 'good', '传承'); }
+      (S.legacy.blueprints || []).forEach(function (b) { S.buildings[b] = Math.max(S.buildings[b] || 0, 1); });
+      if (S.legacy.blueprints.length) log(S, '照着旧图纸，几间屋子直接立了起来。', 'good', '传承');
+      // 开山长老自带一间对应建筑
+      var mj = masterOf(S).job;
+      if (mj && D.BUILD_BY_K[mj]) S.buildings[mj] = Math.max(S.buildings[mj] || 0, 1);
+      log(S, S.name + ' 开山。路数：' + path.n + '，开山长老 ' + masterOf(S).n + '，' +
+        (S.partner === 'none' ? '掌门暂不设道侣' : '道侣 ' + partnerOf(S).n) + '。', 'good', '开宗');
+      log(S, '山门就一间破殿、两间柴房。' + path.d, 'plain', '开局');
+      // 开局送两个弟子
+      recruitOne(S, out, true); recruitOne(S, out, true);
+      out.msg = '开张了。';
+      break;
+    }
+
+    /* ---- 推进一年 ---- */
+    case 'year': {
+      if (!S.created) return { ok: false, msg: '先把宗门建起来。' };
+      if (S.pending) return { ok: false, msg: '先把眼前这件事拿个主意。' };
+      S.year++;
+      log(S, '—— 第 ' + S.year + ' 年 ——', 'year', '纪年');
+      var r = yearEnd(S, out);
+      S.ap = apMaxOf(S); S.apMax = S.ap;
+      if (S.closedYears > 0) S.closedYears--;
+      out.msg = r ? '这一世收尾了。' : '过了一年。';
+      out.result = r || null;
+      break;
+    }
+
+    /* ---- 招募 ---- */
+    case 'recruit': {
+      if (S.pending) return { ok: false, msg: '先了结眼前的事。' };
+      var free = false;
+      if (S.items.ling > 0) { S.items.ling--; free = true; }
+      else if (p.ad) { free = true; }
+      else {
+        if (S.ap <= 0) return { ok: false, msg: '今年的事做完了，点「过一年」。' };
+        var cost = Math.round(80 * (partnerOf(S).per.recruit || 1));
+        if (S.stone < cost) return { ok: false, msg: '灵石不够，招一次要 ' + cost + '。' };
+        S.stone -= cost; S.ap--;
+      }
+      if (liveDisciples(S).length >= capOf(S)) return { ok: false, msg: '弟子寮住满了，先盖寮。' };
+      var nd = recruitOne(S, out, free);
+      if (nd && rnd(S) < 0.22) log(S, pick(S, ['来了三个人，只留下他一个。', '他说走了很远的路才找着这儿。', '问他为啥来，他说顺路。']), 'plain', '招募');
+      S.stat.acts.recruit = (S.stat.acts.recruit || 0) + 1;
+      out.msg = nd ? '招到 ' + nd.name + '。' : '没招着。';
+      break;
+    }
+
+    /* ---- 建筑 ---- */
+    case 'build': {
+      if (S.pending) return { ok: false, msg: '先了结眼前的事。' };
+      var b = D.BUILD_BY_K[p.k];
+      if (!b) return { ok: false, msg: '没这间屋子。' };
+      var lv = S.buildings[p.k] || 0;
+      if (lv >= b.max) return { ok: false, msg: b.n + ' 已经盖到顶了。' };
+      if (p.k !== 'dorm' && lv >= D.LEVELS[levelOf(S)].cap) return { ok: false, msg: '宗门等级不够，得先涨声望。' };
+      if (S.ap <= 0) return { ok: false, msg: '今年的事做完了，点「过一年」。' };
+      var c = buildCost(S, p.k);
+      if (S.stone < c.stone || S.ore < c.ore) return { ok: false, msg: '要 ' + c.stone + ' 灵石、' + c.ore + ' 矿石，不够。' };
+      S.stone -= c.stone; S.ore -= c.ore; S.ap--;
+      S.buildings[p.k] = lv + 1;
+      S.apMax = apMaxOf(S);
+      log(S, (lv ? '把' : '盖起了') + b.n + (lv ? '升到 ' + (lv + 1) + ' 级' : '') + '。' + b.d, 'good', '营造');
+      S.stat.acts.build = (S.stat.acts.build || 0) + 1;
+      out.msg = b.n + (lv ? ' 升级' : ' 落成');
+      break;
+    }
+
+    /* ---- 派任务 ---- */
+    case 'task': {
+      if (S.pending) return { ok: false, msg: '先了结眼前的事。' };
+      var tk = null;
+      D.TASKS.forEach(function (x) { if (x.k === p.k) tk = x; });
+      if (!tk) return { ok: false, msg: '没这趟差事。' };
+      if (S.ap <= 0) return { ok: false, msg: '今年的事做完了，点「过一年」。' };
+      var pool = liveDisciples(S).filter(function (d) { return d.status !== 'hurt'; });
+      if (!pool.length) return { ok: false, msg: '没能使唤的人了。' };
+      var uids = p.uids && p.uids.length ? p.uids : null;
+      var team = uids ? pool.filter(function (d) { return uids.indexOf(String(d.uid)) >= 0 || uids.indexOf(d.uid) >= 0; }) : null;
+      if (!team || !team.length) {
+        // 自动挑最合适的三个
+        team = pool.slice().sort(function (a, b) {
+          var fa = taskFit(S, a, tk), fb = taskFit(S, b, tk);
+          return fb - fa;
+        }).slice(0, 3);
+      }
+      S.ap--;
+      S.stat.tasks[tk.k] = (S.stat.tasks[tk.k] || 0) + 1;
+      S.stat.acts[tk.k] = (S.stat.acts[tk.k] || 0) + 1;
+      if (Object.keys(S.stat.tasks).length >= 6) achAdd(S, 'pai');
+      var names = team.map(function (d) { return d.name; }).join('、');
+      var fit = team.reduce(function (a, d) { return a + taskFit(S, d, tk); }, 0) / team.length;
+      var gain = {};
+      for (var gk in tk.gain) {
+        var gv = tk.gain[gk] * (0.7 + fit * 0.5) * (0.7 + team.length * 0.13);
+        if (gk === 'qi') { team.forEach(function (d) { d.qi += Math.round(gv * growOf(S, d) * 1.5); }); continue; }
+        if (gk === 'grow') { team.forEach(function (d) { d.grow = (d.grow || 0) + gv * 0.1; }); continue; }
+        gain[gk] = Math.round(gv);
+      }
+      var bad = false;
+      if (tk.diff > 0 && rnd(S) < Math.max(0.04, 0.26 - fit * 0.14) * tk.diff) {
+        bad = true;
+        gain = {};
+        if (rnd(S) < 0.7) hurtOne(S, out);
+        log(S, names + ' 去' + tk.n + '，出了点岔子。', 'bad', '差事');
+      } else {
+        applyEff(S, gain, out);
+        team.forEach(function (d) { d.qi += Math.round(8 + tk.diff * 12); });
+        log(S, names + ' 去' + tk.n + '，回来了。' + resStr(gain), 'good', '差事');
+        if (tk.k === 'mi' && rnd(S) < 0.32 && !S.pending) startSecret(S, out);
+        if (tk.k === 'bi') team.forEach(function (d) { d.status = 'closed'; });
+        else team.forEach(function (d) { if (d.status === 'closed') d.status = 'ok'; });
+      }
+      out.msg = bad ? '出了岔子。' : (tk.n + '：' + resStr(gain));
+      break;
+    }
+
+    /* ---- 炼丹 / 炼器 ---- */
+    case 'craft': {
+      if (S.pending) return { ok: false, msg: '先了结眼前的事。' };
+      var recipe = {
+        juqi: { b: 'alchemy', herb: 8, ore: 0, stone: 20, out: 'juqi' },
+        pojing: { b: 'alchemy', herb: 18, ore: 0, stone: 50, out: 'pojing' },
+        huichun: { b: 'alchemy', herb: 12, ore: 0, stone: 30, out: 'huichun' },
+        xisui: { b: 'alchemy', herb: 30, ore: 6, stone: 90, out: 'xisui' },
+        zhuyan: { b: 'alchemy', herb: 20, ore: 0, stone: 40, out: 'zhuyan' },
+        feijian: { b: 'forge', herb: 0, ore: 14, stone: 45, out: 'feijian' },
+        jing: { b: 'forge', herb: 0, ore: 10, stone: 35, out: 'jing' },
+        zhenpan: { b: 'forge', herb: 0, ore: 18, stone: 60, out: 'zhenpan' }
+      }[p.k];
+      if (!recipe) return { ok: false, msg: '没这个方子。' };
+      if (!S.buildings[recipe.b]) return { ok: false, msg: '得先盖' + D.BUILD_BY_K[recipe.b].n + '。' };
+      if (S.ap <= 0) return { ok: false, msg: '今年的事做完了，点「过一年」。' };
+      if (S.herb < recipe.herb || S.ore < recipe.ore || S.stone < recipe.stone) return { ok: false, msg: '材料不够。' };
+      S.herb -= recipe.herb; S.ore -= recipe.ore; S.stone -= recipe.stone; S.ap--;
+      var n = 1 + Math.floor(S.buildings[recipe.b] / 3) + (masterOf(S).per.heal && recipe.b === 'alchemy' ? 1 : 0);
+      var danpu = liveDisciples(S).some(function (d) { return d.talent === 'dan'; });
+      if (danpu) n += 1;
+      S.items[recipe.out] = (S.items[recipe.out] || 0) + n;
+      S.stat.crafts += n;
+      if (n >= 5) achAdd(S, 'dan');
+      log(S, '开了一炉，出了 ' + n + ' 件【' + D.ITEM_BY_K[recipe.out].n + '】。' + (danpu ? '（有人没点火，白多出一炉）' : ''), 'good', '炼制');
+      out.msg = '出 ' + n + ' 件';
+      break;
+    }
+
+    /* ---- 用道具 ---- */
+    case 'useItem': {
+      var it = D.ITEM_BY_K[p.k];
+      if (!it || !S.items[p.k]) return { ok: false, msg: '没这件东西。' };
+      var target = null;
+      S.disciples.forEach(function (d) { if (String(d.uid) === String(p.uid)) target = d; });
+      if (!target) target = liveDisciples(S).slice().sort(function (a, b) { return b.qi - a.qi; })[0];
+      if (it.type === 'fun') {
+        S.items[p.k]--;
+        eggAdd(S, 'jiu');
+        log(S, '一坛酒分着喝了，什么也没发生，大家都很高兴。', 'egg', '道具');
+        break;
+      }
+      if (it.eff.recruit) {
+        S.items[p.k]--;
+        var rd = recruitOne(S, out, true);
+        out.msg = rd ? '用招募令招到 ' + rd.name : '弟子寮满了';
+        break;
+      }
+      if (it.eff.war) { S.items[p.k]--; startWar(S, out); out.msg = '阵盘起效'; break; }
+      if (!target) return { ok: false, msg: '没有能用的人。' };
+      S.items[p.k]--;
+      if (it.eff.qi) target.qi += it.eff.qi;
+      if (it.eff.up) target.upPill = 1;
+      if (it.eff.heal) { target.status = 'ok'; achAdd(S, 'jiu'); }
+      if (it.eff.life) target.lifeBonus += it.eff.life;
+      if (it.eff.quality) {
+        var qi = 0;
+        for (var z = 0; z < D.QUALITY.length; z++) if (D.QUALITY[z].k === target.q) qi = z;
+        if (qi < D.QUALITY.length - 1) target.q = D.QUALITY[qi + 1].k;
+      }
+      if (it.eff.power) target.gear = 'feijian';
+      if (it.eff.guard) { target.gear = 'jing'; target.save = 1; }
+      if (it.eff.grow) target.gongfa = it.n;
+      if (it.eff.save) target.save = 1;
+      log(S, '给 ' + target.name + ' 用了【' + it.n + '】。', 'good', '道具');
+      out.msg = it.n + ' → ' + target.name;
+      break;
+    }
+
+    /* ---- 抉择 ---- */
+    case 'choose': {
+      if (!S.pending) return { ok: false, msg: '眼下没有要拿主意的事。' };
+      var c = choose(S, p.idx | 0, out);
+      if (!c.ok) return c;
+      out.msg = c.msg || '记下了。';
+      break;
+    }
+
+    /* ---- 残卷兑换 ---- */
+    case 'exchange': {
+      var ex = {
+        ling:   { cost: 3, item: 'ling',   n: '招募令' },
+        gongfa: { cost: 3, item: 'gongfa', n: '功法残卷' },
+        pojing: { cost: 4, item: 'pojing', n: '破境丹' },
+        tie:    { cost: 4, item: 'tie',    n: '保命符' },
+        feijian:{ cost: 5, item: 'feijian',n: '飞剑' }
+      }[p.k];
+      if (!ex) return { ok: false, msg: '没这个换法。' };
+      if (S.scroll < ex.cost) return { ok: false, msg: '残卷不够，要 ' + ex.cost + ' 卷。' };
+      S.scroll -= ex.cost;
+      S.items[ex.item] = (S.items[ex.item] || 0) + 1;
+      S.stat.acts.exchange = (S.stat.acts.exchange || 0) + 1;
+      log(S, '拿 ' + ex.cost + ' 卷残卷换了件【' + ex.n + '】。', 'good', '藏经阁');
+      out.msg = '换到 ' + ex.n;
+      break;
+    }
+
+    /* ---- 关掉战报 / 离线面板 ---- */
+    case 'dismissWar': { S.war = null; break; }
+    case 'dismissOffline': { S.offline = null; break; }
+
+    /* ---- 主动收山：随时看结局 ---- */
+    case 'retire': {
+      if (!S.created) return { ok: false, msg: '还没开张。' };
+      if (S.pending) return { ok: false, msg: '先把眼前这件事了了。' };
+      log(S, '掌门把印放在案上，说：就到这儿吧。', 'good', '收山');
+      var rr = endGame(S, null, out);
+      out.result = rr; out.msg = rr.n;
+      break;
+    }
+
+    /* ---- 秘境 ---- */
+    case 'secret': {
+      if (S.pending) return { ok: false, msg: '先把眼前这件事了了。' };
+      if (S.ap <= 0) return { ok: false, msg: '今年的事做完了，点「过一年」。' };
+      S.ap--;
+      log(S, '推开秘境那道门，风从里头吹出来。', 'event', '秘境');
+      startSecret(S, out, 's1');
+      S.stat.acts.secret = (S.stat.acts.secret || 0) + 1;
+      break;
+    }
+
+    /* ---- 关山门（跳过事件，稳一年） ---- */
+    case 'close': {
+      if (S.pending) {
+        log(S, '这事没理，山门关了。' + S.pending.t + ' 就这么过去了。', 'plain', '闭门');
+        S.pending = null;
+      }
+      S.closedYears++;
+      S.fame = Math.max(0, S.fame - 3);
+      S.scroll += 0.5;
+      log(S, '山门关了。这一年的闲事一概不理，弟子们闷头练功。', 'plain', '闭门');
+      liveDisciples(S).forEach(function (d) { d.qi += Math.round(growOf(S, d) * 0.8); d.loyalty = Math.max(0, d.loyalty - 1); });
+      S.stat.acts.close = (S.stat.acts.close || 0) + 1;
+      break;
+    }
+
+    /* ---- 广告 ---- */
+    case 'adStart': {
+      var day = p.day || String(new Date().toDateString());
+      if (S.ad.day !== day) { S.ad.day = day; S.ad.used = 0; }
+      if (S.ad.used >= 3) return { ok: false, msg: '今天三次都用完了，明天再来。' };
+      out.msg = '等看完就能补一次。';
+      break;
+    }
+    case 'adFinish': {
+      var day2 = p.day || String(new Date().toDateString());
+      if (S.ad.day !== day2) { S.ad.day = day2; S.ad.used = 0; }
+      if (S.ad.used >= 3) return { ok: false, msg: '今天三次都用完了。' };
+      S.ad.used++;
+      achAdd(S, 'ad');
+      var mode = p.mode || 'recruit';
+      if (mode === 'recruit') {
+        if (liveDisciples(S).length >= capOf(S)) { S.scroll += 2; log(S, '寮里住满了，改送两卷残卷。', 'good', '广告'); }
+        else { var ad = recruitOne(S, out, true); log(S, '（看完广告）山门口又站了个人：' + (ad ? ad.name : '没人'), 'good', '广告'); }
+      } else if (mode === 'double') {
+        S.stone += Math.round(60 + levelOf(S) * 30); S.herb += 10; S.ore += 8;
+        log(S, '（看完广告）账上多了一笔，年份没变。', 'good', '广告');
+      } else {
+        S.scroll += 3;
+        log(S, '（看完广告）藏经阁多了三卷残卷。', 'good', '广告');
+      }
+      S.stat.acts.ad = (S.stat.acts.ad || 0) + 1;
+      out.msg = '补了一次。';
+      break;
+    }
+
+    /* ---- 连点标题彩蛋 ---- */
+    case 'titleTap': {
+      S.titleTaps++;
+      if (S.titleTaps === 7) eggAdd(S, 'lianming');
+      if (S.titleTaps === 30) { S.scroll += 5; log(S, '匾被敲得咚咚响，掉下来五卷残卷。', 'egg', '彩蛋'); }
+      break;
+    }
+
+    /* ---- 改名 ---- */
+    case 'rename': {
+      S.name = (p.name || S.name).toString().slice(0, 8);
+      log(S, '匾重做了一块，写的是「' + S.name + '」。', 'plain', '山门');
+      break;
+    }
+
+    /* ---- 买道具 ---- */
+    case 'buy': {
+      var bi = D.ITEM_BY_K[p.k];
+      if (!bi) return { ok: false, msg: '没这件东西。' };
+      if (S.stone < bi.price) return { ok: false, msg: '灵石不够。' };
+      S.stone -= bi.price;
+      S.items[p.k] = (S.items[p.k] || 0) + 1;
+      log(S, '从山下买了件【' + bi.n + '】。', 'good', '道具');
+      out.msg = '买到 ' + bi.n;
+      break;
+    }
+
+    /* ---- 传位（继承重开） ---- */
+    case 'transfer': {
+      if (!S.over && S.year < 20) return { ok: false, msg: '才开张没几年，传什么位。' };
+      var keepScroll = Math.min(12, 2 + Math.floor(S.scroll) + Math.floor(levelOf(S) / 2));
+      var built = D.BUILDINGS.filter(function (b) { return S.buildings[b.k] > 0 && b.k !== 'hall' && b.k !== 'dorm'; })
+        .sort(function (a, b) { return S.buildings[b.k] - S.buildings[a.k]; }).slice(0, 3).map(function (b) { return b.k; });
+      var best = liveDisciples(S).slice().sort(function (a, b) { return b.qi - a.qi; })[0];
+      S.legacy = {
+        scroll: (S.legacy.scroll || 0) * 0 + keepScroll,
+        blueprints: built,
+        roster: (S.legacy.roster || []).concat(best ? [best.name + '（' + realmName(best.qi) + '）'] : []).slice(-8),
+        gens: (S.legacy.gens || []).concat([{ gen: S.gen, name: S.name, years: S.year, end: S.result ? S.result.n : '传位' }]).slice(-12)
+      };
+      S.stat.transfers++;
+      if (S.stat.transfers >= 1) achAdd(S, 'chuan');
+      if (S.stat.transfers >= 3) achAdd(S, 'chuan3');
+      var gen = S.gen + 1, rng = S.rng, legacy = S.legacy, stat = S.stat, titleTaps = S.titleTaps;
+      stat.secretRuns = 0; stat.streak = 0;
+      var global = API.globalChoices;
+      var fresh = API.create(rng);
+      fresh.gen = gen; fresh.legacy = legacy; fresh.stat = stat; fresh.titleTaps = titleTaps;
+      fresh.created = true; fresh.name = S.name; fresh.path = S.path;
+      fresh.master = S.master; fresh.partner = S.partner;
+      fresh.stone = pathOf(S).start.stone; fresh.herb = pathOf(S).start.herb;
+      fresh.ore = pathOf(S).start.ore; fresh.scroll = pathOf(S).start.scroll + legacy.scroll;
+      fresh.fame = Math.round(pathOf(S).start.fame + S.fame * 0.08);
+      fresh.buildings = {};
+      D.BUILDINGS.forEach(function (b) { fresh.buildings[b.k] = 0; });
+      fresh.buildings.hall = 1; fresh.buildings.dorm = 1;
+      legacy.blueprints.forEach(function (b) { fresh.buildings[b] = 1; });
+      var mj2 = masterOf(S).job; if (mj2 && D.BUILD_BY_K[mj2]) fresh.buildings[mj2] = Math.max(fresh.buildings[mj2] || 0, 1);
+      // 把状态搬回原对象（保持引用不变，UI 不用重新绑定）
+      Object.keys(S).forEach(function (k) { delete S[k]; });
+      Object.keys(fresh).forEach(function (k) { S[k] = fresh[k]; });
+      API.globalChoices = global;
+      log(S, '—— 第 ' + S.gen + ' 代掌门接印 ——', 'good', '传位');
+      log(S, '上一代留下 ' + legacy.scroll + ' 卷残卷、' + legacy.blueprints.length + ' 张旧图纸。人换了，山门没换。', 'plain', '传承');
+      if (legacy.roster.length) log(S, '历代名录：' + legacy.roster.join('、'), 'plain', '传承');
+      recruitOne(S, out, true); recruitOne(S, out, true);
+      out.msg = '传位完成。';
+      break;
+    }
+
+    /* ---- 重开一局（清空继承） ---- */
+    case 'restart': {
+      API.globalChoices = API.globalChoices || {};
+      var fresh2 = API.create(p.seed || Date.now());
+      Object.keys(S).forEach(function (k) { delete S[k]; });
+      Object.keys(fresh2).forEach(function (k) { S[k] = fresh2[k]; });
+      out.msg = '重开一局。';
+      break;
+    }
+
+    default:
+      return { ok: false, msg: '没这操作：' + type };
+  }
+  return out;
+};
+
+function taskFit(S, d, tk) {
+  var r = rootOf(d.root), q = qualOf(d.q);
+  var v = 0.45 + q.star * 0.07;
+  if (tk.need === 'power') v += powerOf(S, d) / 900;
+  else if (tk.need === 'mu' && d.root === 'mu') v += 0.5;
+  else if (tk.need === 'jin' && d.root === 'jin') v += 0.5;
+  else if (tk.need === 'ins') v += (d.trait === 'chi' || d.trait === 'wen' ? 0.35 : 0);
+  else if (tk.need === 'luck') v += (d.talent === 'mao' || d.trait === 'lan' ? 0.5 : 0);
+  if (d.talent === 'yun' && tk.k !== 'bi') v += 0.2;
+  if (d.talent === 'wu' && tk.k === 'jiang') v += 0.4;
+  if (d.talent === 'ku' && tk.k === 'bi') v += 0.6;
+  if (d.talent === 'du' && tk.k === 'yao') v += 0.4;
+  if (d.status === 'hurt') v -= 0.5;
+  return Math.max(0.05, Math.min(1.6, v));
+}
+
+/* ================= 视图 ================= */
+API.view = function (S) {
+  var v = {
+    created: S.created, name: S.name, year: S.year, gen: S.gen,
+    path: S.path, pathName: pathOf(S).n, pathIcon: pathOf(S).icon, pathColor: pathOf(S).c,
+    pathDesc: pathOf(S).d, masterName: masterOf(S).n, partnerName: partnerOf(S).n,
+    stone: S.stone, herb: S.herb, ore: S.ore, fame: S.fame, scroll: Math.floor(S.scroll),
+    ap: S.ap, apMax: S.apMax,
+    lv: levelOf(S), lvName: D.LEVELS[levelOf(S)].n,
+    nextFame: levelOf(S) < D.LEVELS.length - 1 ? D.LEVELS[levelOf(S) + 1].need : null,
+    nextLvName: levelOf(S) < D.LEVELS.length - 1 ? D.LEVELS[levelOf(S) + 1].n : '已到顶',
+    cap: capOf(S), alive: liveDisciples(S).length,
+    over: !!S.over, result: S.result, war: S.war, offline: S.offline,
+    ad: { used: S.ad.used, max: 3, can: S.ad.used < 3 },
+    eggs: S.eggs.length, ach: S.ach.length, achList: S.ach,
+    eggList: S.eggs.map(function (k) { return { k: k, n: T.EGGS[k] ? T.EGGS[k][0] : k, x: T.EGGS[k] ? T.EGGS[k][1] : '' }; }),
+    achAll: D.ACH.map(function (a) { return { n: a.n, d: a.d, got: S.ach.indexOf(a.k) >= 0 }; }),
+    legacy: S.legacy, stat: S.stat,
+    comboId: (hash([S.path, S.master, S.partner, S.year, S.stat.recruits, S.stat.wins, S.eggs.length].join('|')) % 90000) + 10000,
+    busy: !!S.pending,
+    pending: S.pending ? {
+      t: S.pending.t, who: S.pending.who, x: S.pending.x, tag: S.pending.tag,
+      from: S.pending.from,
+      opts: S.pending.opts.map(function (o, i) { return { i: i, n: o.n, d: o.d, pop: o.pop }; })
+    } : null,
+    disciples: S.disciples.filter(function (d) { return d.status !== 'gone' && d.status !== 'dead'; }).map(function (d) {
+      var q = qualOf(d.q), r = rootOf(d.root);
+      var cur = D.REALMS[d.realm].need, nxt = d.realm < D.REALMS.length - 1 ? D.REALMS[d.realm + 1].need : cur;
+      return {
+        uid: d.uid, name: d.name, qn: q.n, qc: q.c, star: q.star,
+        root: r.n, rootc: r.c, trait: traitOf(d.trait).n,
+        talent: d.talent ? talentOf(d.talent).n : '', talentD: d.talent ? talentOf(d.talent).d : '',
+        realm: D.REALMS[d.realm].n, qi: Math.round(d.qi),
+        qiPct: nxt > cur ? Math.max(0, Math.min(100, Math.round((d.qi - cur) / (nxt - cur) * 100))) : 100,
+        power: powerOf(S, d), age: d.age, status: d.status,
+        statusN: d.status === 'hurt' ? '重伤' : (d.status === 'closed' ? '闭关' : '在册'),
+        gear: d.gear ? (D.ITEM_BY_K[d.gear] ? D.ITEM_BY_K[d.gear].n : d.gear) : '',
+        loyalty: Math.round(d.loyalty), grow: Math.round(growOf(S, d) * 10) / 10
+      };
+    }).sort(function (a, b) { return b.power - a.power; }),
+    buildings: D.BUILDINGS.map(function (b) {
+      var lv = S.buildings[b.k] || 0, c = buildCost(S, b.k);
+      return { k: b.k, n: b.n, icon: b.icon, lv: lv, max: b.max, d: b.d,
+        costStone: c.stone, costOre: c.ore,
+        can: lv < b.max && S.stone >= c.stone && S.ore >= c.ore && S.ap > 0 &&
+             (b.k === 'dorm' || lv < D.LEVELS[levelOf(S)].cap),
+        locked: b.k !== 'dorm' && lv >= D.LEVELS[levelOf(S)].cap,
+        out: b.out };
+    }),
+    items: D.ITEMS.filter(function (it) { return S.items[it.k] > 0; }).map(function (it) {
+      return { k: it.k, n: it.n, icon: it.icon, d: it.d, count: S.items[it.k], type: it.type };
+    }),
+    shop: D.ITEMS.map(function (it) { return { k: it.k, n: it.n, icon: it.icon, d: it.d, price: it.price, can: S.stone >= it.price }; }),
+    tasks: D.TASKS.map(function (t) { return { k: t.k, n: t.n, icon: t.icon, d: t.d, can: S.ap > 0 }; }),
+    logs: S.logs.slice(-70),
+    goal: levelOf(S) < D.LEVELS.length - 1
+      ? ('再攒 ' + (D.LEVELS[levelOf(S) + 1].need - S.fame) + ' 声望，升到「' + D.LEVELS[levelOf(S) + 1].n + '」')
+      : '已经是天下第一，接下来随你怎么走',
+    tips: T.TIPS,
+    paths: D.PATHS, masters: D.MASTERS, partners: D.PARTNERS
+  };
+  return v;
+};
+
+/* ================= 存档 ================= */
+API.serialize = function (S) {
+  S.lastSeen = Date.now();
+  return JSON.stringify(S);
+};
+API.load = function (str) {
+  try {
+    var S = JSON.parse(str);
+    if (!S || S.ver !== D.VER) return null;
+    var base = API.create(S.rng);
+    for (var k in base) if (!(k in S)) S[k] = base[k];
+    D.BUILDINGS.forEach(function (b) { if (typeof S.buildings[b.k] !== 'number') S.buildings[b.k] = 0; });
+    D.ITEMS.forEach(function (it) { if (typeof S.items[it.k] !== 'number') S.items[it.k] = 0; });
+    UID = S.disciples.reduce(function (a, d) { return Math.max(a, d.uid || 0); }, 0) + 1;
+    // 离线收益：最多按 8 小时算，只给资源不推进年份
+    var dt = Math.min(8 * 3600 * 1000, Math.max(0, Date.now() - (S.lastSeen || Date.now())));
+    if (S.created && dt > 5 * 60 * 1000) {
+      var hours = dt / 3600000;
+      var g = {
+        stone: Math.round(hours * (12 + levelOf(S) * 8)),
+        herb: Math.round(hours * (S.buildings.field || 0) * 2),
+        ore: Math.round(hours * (S.buildings.mine || 0) * 1.5),
+        fame: Math.round(hours * (S.buildings.altar || 0) * 0.6)
+      };
+      S.stone += g.stone; S.herb += g.herb; S.ore += g.ore; S.fame += g.fame;
+      S.offline = { hours: Math.round(hours * 10) / 10, g: g };
+      log(S, '离线 ' + S.offline.hours + ' 小时，弟子们自己干了会儿活。', 'good', '挂机');
+    }
+    S.lastSeen = Date.now();
+    return S;
+  } catch (e) { return null; }
+};
+
+API.globalChoices = {};
+API.utils = { hash: hash, rnd: rnd, fmtPct: fmtPct, levelOf: levelOf, pathOf: pathOf, realmName: realmName };
+
+module.exports = API;
+
+});
+__def('sect-idle', function (module, exports, __req) {
+/* 宗门模拟器式挂机内核 · 纯逻辑，零 DOM，网页端与小程序端共用
+ * 复用 sect-data / sect-story 里本项目自写的配置与白话文案。
+ * 界面结构参考用户提供的六张实机截图，人物、文案、数值均为自写。
+ */
+var D = __req('sect-data');
+var T = __req('sect-story');
+var I = {};
+
+I.VER = 3;
+I.NAME = '破山门';
+I.SAVE_KEY = 'poshanmen_idle_v3';
+
+/* ---------------- 工具 ---------------- */
+function rnd(G) {
+  G.rs = (Math.imul(G.rs, 1664525) + 1013904223) >>> 0;
+  return G.rs / 4294967296;
+}
+function ri(G, a, b) { return a + Math.floor(rnd(G) * (b - a + 1)); }
+function pick(G, arr) { return arr[Math.floor(rnd(G) * arr.length)]; }
+function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+function P(t, c) { return { t: String(t == null ? '' : t), c: c || '' }; }
+function fmt(n) {
+  n = Number(n) || 0;
+  var a = Math.abs(n);
+  if (a >= 1e12) return (n / 1e12).toFixed(2) + '万亿';
+  if (a >= 1e8) return (n / 1e8).toFixed(2) + '亿';
+  if (a >= 1e4) return (n / 1e4).toFixed(2) + '万';
+  return String(Math.round(n));
+}
+I.fmt = fmt;
+
+function dateOf(day) {
+  var d = Math.max(1, day | 0);
+  var y = Math.floor((d - 1) / 360) + 1;
+  var m = Math.floor((d - 1) % 360 / 30) + 1;
+  var dd = (d - 1) % 30 + 1;
+  return { y: y, m: m, d: dd, str: '仙历 ' + y + '年' + (m < 10 ? '0' : '') + m + '月' + (dd < 10 ? '0' : '') + dd + '日' };
+}
+I.dateOf = dateOf;
+
+function nameOf(G) {
+  return pick(G, D.SURNAMES) + pick(G, D.GIVEN1);
+}
+function qualityOf(G) {
+  var tot = 0, i;
+  for (i = 0; i < D.QUALITY.length; i++) tot += D.QUALITY[i].w;
+  var r = rnd(G) * tot;
+  for (i = 0; i < D.QUALITY.length; i++) { r -= D.QUALITY[i].w; if (r <= 0) return D.QUALITY[i]; }
+  return D.QUALITY[0];
+}
+function titleOf(G) {
+  return pick(G, ['剑修', '丹修', '阵修', '符修', '体修', '气修', '御兽修']);
+}
+
+/* ---------------- 常量表 ---------------- */
+var EQUIP_SLOTS = [
+  { k: 'sword', n: '兵刃', icon: '剑' }, { k: 'book', n: '功法', icon: '卷' },
+  { k: 'cloth', n: '衣裳', icon: '衣' }, { k: 'shoe', n: '鞋履', icon: '履' },
+  { k: 'orn', n: '灵饰', icon: '佩' }, { k: 'tool', n: '法宝', icon: '宝' },
+  { k: 'art', n: '神通', icon: '术' }, { k: 'heri', n: '传承', icon: '承' }
+];
+var DAO = [
+  { k: 'rui', n: '锐锋道种', d: '战力 +8%', cost: 3 },
+  { k: 'hou', n: '厚土道种', d: '每秒灵石 +6', cost: 3 },
+  { k: 'ming', n: '明心道种', d: '每秒修为 +8', cost: 4 },
+  { k: 'fu', n: '福泽道种', d: '事件好运概率 +10%', cost: 4 },
+  { k: 'shou', n: '长春道种', d: '寿元 +200', cost: 5 },
+  { k: 'kuang', n: '狂澜道种', d: '突破成功率 +8%', cost: 6 }
+];
+var PETS = [
+  { k: 'mao', n: '三花猫', d: '挂机修为 +4/秒', cost: 12 },
+  { k: 'he', n: '白鹤', d: '游历额外 +2 天', cost: 20 },
+  { k: 'gui', n: '老龟', d: '战力 +6%', cost: 26 },
+  { k: 'jiao', n: '小蛟', d: '突破不掉修为', cost: 40 }
+];
+var SIGN = [
+  [{ k: 'qi', n: '聚气丹', v: 1500000 }, { k: 'jade', n: '仙玉', v: 1 }],
+  [{ k: 'stone', n: '灵石', v: 500000 }, { k: 'jade', n: '仙玉', v: 1 }],
+  [{ k: 'jade', n: '仙玉', v: 2 }, { k: 'purple', n: '玄晶', v: 200 }],
+  [{ k: 'stone', n: '灵石', v: 1000000 }, { k: 'purple', n: '玄晶', v: 200 }],
+  [{ k: 'stone', n: '灵石', v: 2000000 }, { k: 'purple', n: '玄晶', v: 200 }],
+  [{ k: 'stone', n: '灵石', v: 3000000 }, { k: 'purple', n: '玄晶', v: 200 }],
+  [{ k: 'jade', n: '仙玉', v: 5 }, { k: 'purple', n: '玄晶', v: 500 }]
+];
+var QUESTS = [
+  { k: 'men2', n: '宗门达到 2 人', max: 2, reward: '仙玉 ×2' },
+  { k: 'break1', n: '完成 1 次突破', max: 1, reward: '灵石 ×20万' },
+  { k: 'travel3', n: '外出游历 3 次', max: 3, reward: '玄晶 ×200' },
+  { k: 'array1', n: '盖起聚灵阵', max: 1, reward: '灵石 ×50万' },
+  { k: 'sign7', n: '累计签到 7 天', max: 7, reward: '仙玉 ×5' },
+  { k: 'men8', n: '宗门达到 8 人', max: 8, reward: '玄晶 ×500' },
+  { k: 'break6', n: '完成 6 次突破', max: 6, reward: '仙玉 ×10' }
+];
+var RANK_TITLE = ['踏云而来的', '剑荡九州的', '天道圣者的', '秋水剑心的', '凌霄天尊的', '赤霄剑主的', '幻影真仙的', '青衫客的', '不问尘事的', '一剑破晓的'];
+var RANK_SUR = ['慕', '楚', '张', '何', '刘', '尹', '百里', '雷', '沈', '苏', '陆', '顾'];
+
+/* ---------------- 状态 ---------------- */
+I.create = function (seed) {
+  seed = (seed == null ? Date.now() : seed) >>> 0;
+  var G = {
+    v: I.VER, rs: seed || 1, seed: seed, created: false,
+    name: '破山门', path: 'zheng', master: 'jian', partner: 'none', gen: 1,
+    day: 1, qi: 0, realm: 0, breakBonus: 0, power: 0, peakPower: 0,
+    jade: 3, stone: 152300, purple: 0, herb: 20, ore: 12, scroll: 2, fame: 0,
+    energy: 52, keys: 1, energyTick: 0,
+    disciples: [], uid: 1, lead: 0, focus: 0, cap: 20,
+    buildings: {}, formation: [], dao: [], pets: [], items: {},
+    flags: {}, eggs: [], ach: {}, recent: [],
+    journal: [], pending: null, result: null, offline: null,
+    sign: { key: '', streak: 0, total: 0, got: [] },
+    questIdx: 0, questGot: [], stat: { travels: 0, breaks: 0, recruits: 0, wins: 0, loses: 0, chooses: [0, 0, 0] },
+    ad: { key: '', used: 0 }, auto: false, speed: 1, savedAt: 0, comboId: 0
+  };
+  return G;
+};
+
+function makeDisciple(G, opt) {
+  opt = opt || {};
+  var q = opt.q || qualityOf(G);
+  var root = opt.root || pick(G, D.ROOTS);
+  var trait = opt.trait || pick(G, D.TRAITS);
+  var talent = (!opt.noTalent && rnd(G) < 0.34) ? pick(G, D.TALENTS) : null;
+  var d = {
+    uid: G.uid++, name: nameOf(G), title: titleOf(G),
+    root: root.n, rootK: root.k, rootC: root.c,
+    qn: q.n, qc: q.c, qk: q.k, qmul: q.mul, star: q.star,
+    trait: trait.n, traitGrow: trait.grow, traitRisk: trait.risk,
+    talent: talent ? talent.n : '', talentD: talent ? talent.d : '',
+    age: ri(G, 15, 28), life: 65 + Math.floor(q.mul * 30),
+    qi: 0, realm: 0, power: 0, loyalty: 70,
+    gen: { gg: 0, fy: 0, wx: 0, zz: 0, ss: 0, tp: 0 },
+    equip: {}, dao: [], pet: '', journal: [], status: 'ok'
+  };
+  var base = Math.round(18 + q.mul * 22);
+  d.gen = {
+    gg: clamp(base + ri(G, -8, 18), 8, 99),
+    fy: clamp(base + ri(G, -8, 18), 8, 99),
+    wx: clamp(base + ri(G, -8, 18), 8, 99),
+    zz: clamp(base + ri(G, -5, 70), 8, 160),
+    ss: clamp(base + ri(G, -8, 18), 8, 99),
+    tp: clamp(base + ri(G, -8, 18), 8, 99)
+  };
+  // 开局白送一把兵刃
+  d.equip.sword = { lv: 1, q: 1, n: '青锋' };
+  d.power = Math.round(90 + q.mul * 140 + d.gen.zz * 1.2);
+  d.journal.unshift({ date: dateOf(G.day).str, parts: [P(d.name, 'name'), P('背着包袱上了山，站在院里等了半天，才有人想起来给他安排住处。')] });
+  return d;
+}
+
+function pathOf(G) { for (var i = 0; i < D.PATHS.length; i++) if (D.PATHS[i].k === G.path) return D.PATHS[i]; return D.PATHS[0]; }
+function masterOf(G) { for (var i = 0; i < D.MASTERS.length; i++) if (D.MASTERS[i].k === G.master) return D.MASTERS[i]; return D.MASTERS[0]; }
+function partnerOf(G) { for (var i = 0; i < D.PARTNERS.length; i++) if (D.PARTNERS[i].k === G.partner) return D.PARTNERS[i]; return D.PARTNERS[4]; }
+function leadOf(G) {
+  for (var i = 0; i < G.disciples.length; i++) if (G.disciples[i].uid === G.lead) return G.disciples[i];
+  return G.disciples[0] || null;
+}
+function focusOf(G) {
+  for (var i = 0; i < G.disciples.length; i++) if (G.disciples[i].uid === G.focus) return G.disciples[i];
+  return leadOf(G);
+}
+function alive(G) { return G.disciples.filter(function (d) { return d.status === 'ok'; }); }
+function hasDao(G, k) { return G.dao.indexOf(k) >= 0; }
+function hasPet(G, k) { return G.pets.indexOf(k) >= 0; }
+
+function qiMaxOf(G) {
+  var cur = D.REALMS[clamp(G.realm, 0, D.REALMS.length - 1)];
+  var nx = D.REALMS[clamp(G.realm + 1, 0, D.REALMS.length - 1)];
+  return Math.max(1200, (nx.need - cur.need) * 10);
+}
+I.qiMaxOf = qiMaxOf;
+
+function qiRateOf(G) {
+  var arr = G.buildings.array || 0, d = leadOf(G);
+  var r = 8 + G.realm * 3 + arr * 4 + (d ? d.qmul * 3 + d.traitGrow * 2 : 0);
+  if (hasDao(G, 'ming')) r += 8;
+  if (hasPet(G, 'mao')) r += 4;
+  var per = pathOf(G).per.grow || 1;
+  var mp = masterOf(G).per.grow || 1;
+  return Math.max(1, Math.round(r * per * mp));
+}
+function stoneRateOf(G) {
+  var r = 6 + (G.buildings.mine || 0) * 3 + (G.buildings.altar || 0) * 1;
+  if (hasDao(G, 'hou')) r += 6;
+  return Math.max(1, Math.round(r * (pathOf(G).per.stone || 1)));
+}
+function equipPower(d) {
+  var p = 0;
+  EQUIP_SLOTS.forEach(function (s) {
+    var e = d.equip[s.k];
+    if (e) p += Math.round((70 + e.lv * 130) * (e.q || 1));
+  });
+  return p;
+}
+function calcPower(G) {
+  var d = leadOf(G);
+  var base = 800 + Math.pow(G.realm + 1, 1.8) * 900 + G.qi * 2.2 + G.breakBonus;
+  var eq = d ? equipPower(d) : 0;
+  var men = alive(G).reduce(function (a, x) { return a + x.power * 0.15; }, 0);
+  var bld = (G.buildings.arena || 0) * 260 + (G.buildings.ward || 0) * 90;
+  var mul = 1 + (G.buildings.arena || 0) * 0.08 + G.formation.length * 0.06 + G.dao.length * 0.06
+    + G.pets.length * 0.06 + (G.powerBuff || 0) * 0.05
+    + (masterOf(G).per.power ? masterOf(G).per.power - 1 : 0)
+    + (partnerOf(G).per.power ? partnerOf(G).per.power - 1 : 0);
+  mul *= (pathOf(G).per.power || 1);
+  G.power = Math.max(100, Math.round((base + eq + men + bld) * mul));
+  if (G.power > G.peakPower) G.peakPower = G.power;
+  return G.power;
+}
+I.calcPower = calcPower;
+
+/* ---------------- 日志 ---------------- */
+function jlog(G, parts, k, who) {
+  G.journal.unshift({ date: dateOf(G.day).str, parts: parts, k: k || 'plain' });
+  if (G.journal.length > 80) G.journal.length = 80;
+  var d = who || leadOf(G);
+  if (d) {
+    d.journal.unshift({ date: dateOf(G.day).str, parts: parts });
+    if (d.journal.length > 40) d.journal.length = 40;
+  }
+}
+function effParts(G, e, out) {
+  var a = [];
+  var num = function (k, n, unit, good) {
+    if (!n) return;
+    a.push(P((n > 0 ? '多了 ' : '少了 ') + fmt(Math.abs(n)) + ' ' + unit + '。', good ? (n > 0 ? 'good' : 'bad') : (n > 0 ? 'good' : 'bad')));
+  };
+  if (e.stone) num('stone', e.stone, '灵石');
+  if (e.herb) num('herb', e.herb, '药材');
+  if (e.ore) num('ore', e.ore, '矿石');
+  if (e.fame) num('fame', e.fame, '声望');
+  if (e.scroll) num('scroll', e.scroll, '卷残卷');
+  if (e.qi) a.push(P('修为涨了 ' + fmt(e.qi) + '。', 'good'));
+  if (e.grow) a.push(P('往后每年都练得快一点。', 'good'));
+  if (e.power) a.push(P('弟子们打架更有底气了。', 'good'));
+  if (e.up) a.push(P('下次突破稳了。', 'good'));
+  if (e.loyalty) a.push(P(e.loyalty > 0 ? '弟子们心里舒坦了些。' : '有人小声嘀咕了两句。', e.loyalty > 0 ? 'good' : 'bad'));
+  if (e.recruit) {
+    var nd = makeDisciple(G);
+    G.disciples.push(nd); G.stat.recruits++;
+    a.push(P('门口多了个人，说叫 ' + nd.name + '。', 'name'));
+    out.recruited = nd.name;
+  }
+  if (e.item) {
+    G.items[e.item] = (G.items[e.item] || 0) + 1;
+    var it = D.ITEM_BY_K[e.item];
+    a.push(P('袋子里多了' + (it ? it.n : '一件东西') + '。', 'good'));
+  }
+  if (e.egg && T.EGGS[e.egg] && G.eggs.indexOf(e.egg) < 0) {
+    G.eggs.push(e.egg);
+    a.push(P('这事后来被记进了宗门志：【' + T.EGGS[e.egg][0] + '】。', 'egg'));
+  }
+  if (e.flag) G.flags[e.flag] = 1;
+  if (e.hurt) a.push(P('有人挂了彩，歇了几天。', 'bad'));
+  if (e.risk && rnd(G) < e.risk) {
+    G.stone = Math.max(0, G.stone - 12000);
+    a.push(P('本来想占个便宜，结果赔了一笔灵石。', 'bad'));
+  }
+  if (!a.length) a.push(P('什么也没发生，日子照旧过。'));
+  return a;
+}
+function applyEff(G, e, out) {
+  var m = { stone: 'stone', herb: 'herb', ore: 'ore', fame: 'fame', scroll: 'scroll', qi: 'qi', purple: 'purple', jade: 'jade' };
+  for (var k in m) if (e[k]) G[m[k]] = Math.max(0, G[m[k]] + e[k]);
+  if (e.grow) G.growBuff = (G.growBuff || 0) + e.grow;
+  if (e.power) G.powerBuff = (G.powerBuff || 0) + e.power;
+  if (e.loyalty) alive(G).forEach(function (d) { d.loyalty = clamp(d.loyalty + e.loyalty, 0, 100); });
+  if (e.up) G.upBuff = (G.upBuff || 0) + 1;
+  calcPower(G);
+}
+
+/* ---------------- 建宗门 ---------------- */
+I.setup = function (G, o) {
+  o = o || {};
+  if (G.created) return { ok: false, msg: '山门已经开了。' };
+  G.name = String(o.name || '破山门').slice(0, 8);
+  G.path = o.path || 'zheng';
+  G.master = o.master || 'jian';
+  G.partner = o.partner || 'none';
+  var p = pathOf(G).start;
+  G.stone = p.stone * 60 + 152300; G.herb = p.herb; G.ore = p.ore; G.scroll = p.scroll; G.fame = p.fame;
+  if (masterOf(G).per.array) G.buildings.array = 1;
+  if (masterOf(G).per.ward) G.buildings.ward = 1;
+  G.buildings.dorm = 1;
+  var d = makeDisciple(G, { q: D.QUALITY[3] });
+  G.disciples.push(d); G.lead = d.uid; G.focus = d.uid; G.formation = [d.uid];
+  G.qi = 1279;
+  G.created = true;
+  G.comboId = (G.seed % 9000) + 1000 + D.PATHS.map(function (x) { return x.k; }).indexOf(G.path) * 17;
+  calcPower(G);
+  jlog(G, [P(G.name, 'name'), P('挂上了匾。院里就一间殿、两间柴房，', ''), P(d.name, 'name'), P('是第一个上门的人。')], 'good');
+  jlog(G, [P('开山长老：' + masterOf(G).n + '。', 'tag'), P('路子定的是' + pathOf(G).n + '，往后怎么走，看你自己。')], 'plain');
+  return { ok: true, msg: '开门了' };
+};
+
+/* ---------------- 挂机 / 游历 ---------------- */
+I.tick = function (G, sec) {
+  if (!G.created || G.result) return { ok: false };
+  sec = clamp(Number(sec) || 0, 0, 3600);
+  if (sec <= 0) return { ok: true };
+  var q = qiRateOf(G) * sec * G.speed;
+  var max = qiMaxOf(G);
+  G.qi = Math.min(max, G.qi + q);
+  G.stone += stoneRateOf(G) * sec * G.speed;
+  G.fame += (G.buildings.altar || 0) * 0.02 * sec;
+  G.day += sec * G.speed;
+  G.energyTick = (G.energyTick || 0) + sec;
+  if (G.energyTick >= 4) {
+    var add = Math.floor(G.energyTick / 4);
+    G.energyTick -= add * 4;
+    G.energy = Math.min(60 + G.keys * 10, G.energy + add);
+  }
+  calcPower(G);
+  return { ok: true, qi: q };
+};
+
+function eventOk(G, ev) {
+  var c = ev.cond || {};
+  var dt = dateOf(G.day);
+  if (c.minYear && dt.y < c.minYear) return false;
+  if (c.maxYear && dt.y > c.maxYear) return false;
+  if (c.reqFlag && !G.flags[c.reqFlag]) return false;
+  if (c.noFlag && G.flags[c.noFlag]) return false;
+  if (c.needBuild && !G.buildings[c.needBuild]) return false;
+  if (c.minLv && (G.buildings.hall || 0) < c.minLv) return false;
+  if (G.recent.indexOf(ev.id) >= 0) return false;
+  return true;
+}
+function findEvent(G) {
+  var pool = T.EVENTS.filter(function (e) { return eventOk(G, e); });
+  if (!pool.length) { G.recent = []; pool = T.EVENTS.filter(function (e) { return eventOk(G, e); }); }
+  if (!pool.length) return null;
+  var tot = 0;
+  pool.forEach(function (e) { tot += e.w || 10; });
+  var r = rnd(G) * tot;
+  for (var i = 0; i < pool.length; i++) { r -= pool[i].w || 10; if (r <= 0) return pool[i]; }
+  return pool[0];
+}
+function raise(G, ev) {
+  G.recent.unshift(ev.id);
+  if (G.recent.length > 7) G.recent.length = 7;
+  var opts = ev.opts.map(function (o, i) {
+    return { n: o.n, d: o.d, e: o.e || {}, egg: o.egg || '', flag: o.flag || '', risk: o.risk || 0,
+      pop: clamp(Math.round((D.POP.opts[i] || 0.2) * 100 + ri(G, -7, 7)), 3, 92) };
+  });
+  G.pending = { id: ev.id, t: ev.t, who: ev.who || '路上', tag: ev.tag || '日常', x: ev.x, opts: opts,
+    date: dateOf(G.day).str, guest: nameOf(G), guestRealm: D.REALMS[clamp(G.realm + ri(G, 0, 1), 0, 9)].n };
+  return G.pending;
+}
+
+I.travel = function (G, n) {
+  if (!G.created) return { ok: false, msg: '还没开门。' };
+  if (G.pending) return { ok: false, msg: '眼前这事还没了。' };
+  if (G.result) return { ok: false, msg: '这一世已经收尾了。' };
+  if (G.energy < 1) return { ok: false, msg: '游历令用完了，等一会儿回一点。' };
+  n = n || 1;
+  G.energy -= 1;
+  I.tick(G, 15 + (hasPet(G, 'he') ? 2 : 0));
+  G.stat.travels += n;
+  G.fame += 2;
+  var lucky = 0.72 + (hasDao(G, 'fu') ? 0.1 : 0);
+  if (rnd(G) < lucky) {
+    var ev = findEvent(G);
+    if (ev) { raise(G, ev); return { ok: true, event: true, msg: '路上撞见一件事。' }; }
+  }
+  jlog(G, [P(leadOf(G) ? leadOf(G).name : '弟子', 'name'), P('出门走了一趟，' + pick(G, T.FLAVOR))], 'plain');
+  return { ok: true, event: false, msg: '走了一趟，平安回来。' };
+};
+
+I.choose = function (G, idx) {
+  if (!G.pending) return { ok: false, msg: '现在没有要拿主意的事。' };
+  var p = G.pending;
+  idx = clamp(idx | 0, 0, p.opts.length - 1);
+  var o = p.opts[idx];
+  var e = {}; for (var k in o.e) e[k] = o.e[k];
+  if (o.egg) e.egg = o.egg;
+  if (o.flag) e.flag = o.flag;
+  if (o.risk) e.risk = o.risk;
+  var out = {};
+  var tail = effParts(G, e, out);
+  applyEff(G, e, out);
+  G.stat.chooses[idx] = (G.stat.chooses[idx] || 0) + 1;
+  G.pending = null;
+  var lead = leadOf(G);
+  var parts = [P(lead ? lead.name : '弟子', 'name'), P('行至一处，' + p.x + ' ', '')];
+  parts.push(P('【' + o.n + '】', 'tag'));
+  tail.forEach(function (q) { parts.push(q); });
+  jlog(G, parts, e.egg ? 'egg' : 'event');
+  // 选项偶尔掉一件装备 / 道种线索
+  if (rnd(G) < 0.22 && lead) {
+    var s = pick(G, EQUIP_SLOTS);
+    if (!lead.equip[s.k]) {
+      lead.equip[s.k] = { lv: 1, q: 1, n: s.n };
+      jlog(G, [P('回来的路上捡到一件' + s.n + '，先给', ''), P(lead.name, 'name'), P('挂上了。', 'good')], 'good');
+    }
+  }
+  calcPower(G);
+  checkQuest(G);
+  return { ok: true, msg: o.n, parts: parts };
+};
+
+I.breakthrough = function (G) {
+  if (!G.created) return { ok: false, msg: '还没开门。' };
+  var max = qiMaxOf(G), r = clamp(G.realm, 0, D.REALMS.length - 1);
+  if (G.realm >= D.REALMS.length - 1) return { ok: false, msg: '已经到顶了。' };
+  if (G.qi < max) return { ok: false, msg: '修为还差 ' + fmt(max - G.qi) + '。' };
+  var up = D.REALMS[r].up + (G.upBuff ? 0.25 : 0) + (hasDao(G, 'kuang') ? 0.08 : 0);
+  G.upBuff = 0;
+  var win = rnd(G) < up;
+  var lead = leadOf(G);
+  if (win) {
+    G.qi = Math.max(0, G.qi - max);
+    G.realm++;
+    G.breakBonus += 1200 + G.realm * 400;
+    G.stat.breaks++;
+    if (lead) { lead.realm = G.realm; lead.power += 180 + G.realm * 60; }
+    jlog(G, [P(lead ? lead.name : '弟子', 'name'), P('闭关数日，一口气冲到', ''), P(D.REALMS[G.realm].n, 'good'), P('。山门口的铜铃自己响了半天。')], 'good');
+    checkQuest(G);
+    calcPower(G);
+    return { ok: true, win: true, msg: '突破成功 · ' + D.REALMS[G.realm].n };
+  }
+  var pet = hasPet(G, 'jiao');
+  G.qi = pet ? Math.round(max * 0.95) : Math.round(max * 0.7);
+  jlog(G, [P('这回没冲过去。', 'bad'), P(lead ? lead.name : '弟子', 'name'),
+    P(pet ? '有小蛟护着，修为几乎没掉。' : '掉了些修为，坐在台阶上缓了半天。')], 'bad');
+  calcPower(G);
+  return { ok: true, win: false, msg: '没冲过去，再来一次' };
+};
+
+/* ---------------- 弟子 / 装备 / 道种 / 灵宠 / 布阵 ---------------- */
+I.recruit = function (G, free) {
+  if (!G.created) return { ok: false, msg: '还没开门。' };
+  if (alive(G).length >= G.cap) return { ok: false, msg: '住不下了，先盖弟子寮。' };
+  var cost = 60000;
+  if (!free) { if (G.stone < cost) return { ok: false, msg: '灵石不够。' }; G.stone -= cost; }
+  var d = makeDisciple(G);
+  G.disciples.push(d); G.stat.recruits++;
+  jlog(G, [P('山门外来个' + d.qn + '的' + d.root + '灵根弟子，叫', ''), P(d.name, 'name'), P('。' + (d.talent ? '看着还有点说不清的门道。' : '先安排住下。'))], 'good');
+  calcPower(G); checkQuest(G);
+  return { ok: true, msg: '收下了 ' + d.name, name: d.name };
+};
+I.focus = function (G, uid) {
+  G.focus = uid | 0;
+  return { ok: true };
+};
+I.equip = function (G, k) {
+  var d = focusOf(G);
+  if (!d) return { ok: false, msg: '没有弟子。' };
+  var slot = null;
+  EQUIP_SLOTS.forEach(function (s) { if (s.k === k) slot = s; });
+  if (!slot) return { ok: false, msg: '没这个格子。' };
+  var e = d.equip[k];
+  if (!e) {
+    if (G.ore < 8) return { ok: false, msg: '矿石不够，寻一件要 8 矿。' };
+    G.ore -= 8;
+    d.equip[k] = { lv: 1, q: 1 + (rnd(G) < 0.18 ? 1 : 0), n: slot.n };
+    jlog(G, [P(d.name, 'name'), P('配上了' + slot.n + '，试了两下，挺趁手。', 'good')], 'good');
+  } else {
+    var cost = 4 + e.lv * 3;
+    if (G.ore < cost) return { ok: false, msg: '强化要 ' + cost + ' 矿。' };
+    G.ore -= cost; e.lv++;
+    jlog(G, [P(d.name, 'name'), P('把' + slot.n + '淬到 +' + e.lv + '，火星子溅了一地。', 'good')], 'good');
+  }
+  d.power += 60;
+  calcPower(G);
+  return { ok: true, msg: slot.n + (e ? ' 强化到 +' + e.lv : ' 已装备') };
+};
+I.dao = function (G, k) {
+  var x = null;
+  DAO.forEach(function (a) { if (a.k === k) x = a; });
+  if (!x) return { ok: false, msg: '没有这道种。' };
+  if (hasDao(G, k)) return { ok: false, msg: '已经种下了。' };
+  if (G.scroll < x.cost) return { ok: false, msg: '残卷不够，要 ' + x.cost + ' 卷。' };
+  G.scroll -= x.cost; G.dao.push(k);
+  jlog(G, [P('藏经阁翻出一枚', ''), P(x.n, 'good'), P('，' + x.d + '。')], 'good');
+  calcPower(G);
+  return { ok: true, msg: '种下 ' + x.n };
+};
+I.pet = function (G, k) {
+  var x = null;
+  PETS.forEach(function (a) { if (a.k === k) x = a; });
+  if (!x) return { ok: false, msg: '没有这只。' };
+  if (hasPet(G, k)) return { ok: false, msg: '已经在院里了。' };
+  if (G.herb < x.cost) return { ok: false, msg: '药材不够，要 ' + x.cost + '。' };
+  G.herb -= x.cost; G.pets.push(k);
+  var d = focusOf(G); if (d) d.pet = x.n;
+  jlog(G, [P('院里多了只', ''), P(x.n, 'good'), P('，' + x.d + '。')], 'good');
+  calcPower(G);
+  return { ok: true, msg: x.n + ' 留下了' };
+};
+I.formation = function (G, uid) {
+  uid = uid | 0;
+  var i = G.formation.indexOf(uid);
+  if (i >= 0) G.formation.splice(i, 1);
+  else {
+    if (G.formation.length >= 5) return { ok: false, msg: '阵上最多站 5 人。' };
+    G.formation.push(uid);
+  }
+  calcPower(G);
+  return { ok: true, msg: '阵型变了' };
+};
+
+/* ---------------- 洞府 / 差事 / 商店 / 宗门战 ---------------- */
+function buildCost(G, b) {
+  var lv = G.buildings[b.k] || 0;
+  var m = Math.pow(1.65, lv);
+  return { stone: Math.round(b.cost.stone * m), ore: Math.round(b.cost.ore * m + lv * 3) };
+}
+I.build = function (G, k) {
+  var b = D.BUILD_BY_K[k];
+  if (!b) return { ok: false, msg: '没这处地方。' };
+  var lv = G.buildings[k] || 0;
+  if (lv >= b.max) return { ok: false, msg: '已经盖到顶了。' };
+  var hall = G.buildings.hall || 0;
+  if (k !== 'dorm' && k !== 'hall' && lv >= hall + D.LEVELS[0].cap) return { ok: false, msg: '大殿等级不够，先升山门大殿。' };
+  var c = buildCost(G, b);
+  if (G.stone < c.stone || G.ore < c.ore) return { ok: false, msg: '材料不够，要 ' + fmt(c.stone) + ' 灵石 / ' + c.ore + ' 矿。' };
+  G.stone -= c.stone; G.ore -= c.ore;
+  G.buildings[k] = lv + 1;
+  if (k === 'dorm') G.cap = Math.min(20, 3 + G.buildings.dorm * 3);
+  jlog(G, [P(b.n, 'good'), P('升到第 ' + (lv + 1) + ' 级。' + b.d)], 'good');
+  checkQuest(G); calcPower(G);
+  return { ok: true, msg: b.n + ' Lv.' + (lv + 1) };
+};
+I.task = function (G, k) {
+  var t = null;
+  D.TASKS.forEach(function (x) { if (x.k === k) t = x; });
+  if (!t) return { ok: false, msg: '没这趟差事。' };
+  if (G.energy < 3) return { ok: false, msg: '精力不够，派差事要 3 点。' };
+  G.energy -= 3;
+  var g = t.gain;
+  if (g.stone) G.stone += g.stone * 40;
+  if (g.herb) G.herb += g.herb;
+  if (g.ore) G.ore += g.ore;
+  if (g.fame) G.fame += g.fame;
+  if (g.scroll) G.scroll += g.scroll;
+  if (g.qi) G.qi = Math.min(qiMaxOf(G), G.qi + 90);
+  var parts = [P('派人去' + t.n + '。', ''), P('回来一算：', '')];
+  if (g.stone) parts.push(P('灵石 ' + fmt(g.stone * 40) + '，', 'good'));
+  if (g.herb) parts.push(P('药材 ' + g.herb + '，', 'good'));
+  if (g.ore) parts.push(P('矿石 ' + g.ore + '，', 'good'));
+  if (g.scroll) parts.push(P('残卷 ' + g.scroll + ' 卷，', 'good'));
+  if (g.fame) parts.push(P('声望 ' + g.fame + '。', 'good'));
+  if (g.qi) parts.push(P('闭关的人修为涨了一截。', 'good'));
+  jlog(G, parts, 'good');
+  G.day += 10;
+  calcPower(G);
+  return { ok: true, msg: t.n + ' 办妥了' };
+};
+I.buy = function (G, k) {
+  var it = D.ITEM_BY_K[k];
+  if (!it) return { ok: false, msg: '铺子里没这个。' };
+  if (G.stone < it.price * 40) return { ok: false, msg: '灵石不够。' };
+  G.stone -= it.price * 40;
+  G.items[k] = (G.items[k] || 0) + 1;
+  if (it.eff.qi) G.qi = Math.min(qiMaxOf(G), G.qi + it.eff.qi);
+  if (it.eff.recruit) return I.recruit(G, true);
+  if (it.eff.power) G.powerBuff = (G.powerBuff || 0) + it.eff.power;
+  if (it.eff.up) G.upBuff = (G.upBuff || 0) + 1;
+  jlog(G, [P('山下铺子买回', ''), P(it.n, 'good'), P('，先收进袋子。')], 'plain');
+  calcPower(G);
+  return { ok: true, msg: '买到 ' + it.n };
+};
+I.war = function (G, k) {
+  var en = null;
+  D.ENEMIES.forEach(function (x) { if (x.k === k) en = x; });
+  if (!en) return { ok: false, msg: '没这场架。' };
+  if (G.fame < en.minLv * 60) return { ok: false, msg: '声望不够，人家不来。' };
+  var mine = G.power, foe = en.power * 30 + 800;
+  var win = rnd(G) < clamp(0.25 + mine / (mine + foe) * 0.9, 0.1, 0.95);
+  var lines = [P(en.n + '：' + en.d, '')];
+  if (win) {
+    G.stat.wins++; G.fame += en.gain.fame || 30; G.stone += (en.gain.stone || 100) * 40;
+    lines.push(P('打了一整日，' + (leadOf(G) ? leadOf(G).name : '弟子') + '把人送下了山。', 'good'));
+    lines.push(P('声望 +' + (en.gain.fame || 30) + '，灵石 +' + fmt((en.gain.stone || 100) * 40) + '。', 'good'));
+  } else {
+    G.stat.loses++; G.stone = Math.max(0, G.stone - 20000);
+    lines.push(P('没打过，赔了些灵石，弟子们闷头回屋。', 'bad'));
+  }
+  jlog(G, lines, win ? 'good' : 'bad');
+  G.day += 20;
+  return { ok: true, win: win, lines: lines, title: en.n };
+};
+
+/* ---------------- 签到 / 广告 / 任务 ---------------- */
+I.sign = function (G, key) {
+  key = key || String(G.day);
+  if (G.sign.key === key) return { ok: false, msg: '今天已经签过了。' };
+  var idx = G.sign.streak % 7;
+  var arr = SIGN[idx];
+  var gain = [];
+  arr.forEach(function (a) {
+    if (a.k === 'qi') G.qi = Math.min(qiMaxOf(G), G.qi + a.v * 0.02);
+    else G[a.k] = (G[a.k] || 0) + a.v;
+    gain.push(a.n + ' ×' + fmt(a.v));
+  });
+  if (idx === 0 && G.sign.streak > 0) G.sign.got = [];
+  G.sign.got[idx] = 1;
+  G.sign.streak++; G.sign.total++; G.sign.key = key;
+  jlog(G, [P('签到第 ' + G.sign.streak + ' 天，领了 ', ''), P(gain.join('、'), 'good'), P('。')], 'good');
+  checkQuest(G);
+  return { ok: true, msg: '今日已签到 · ' + gain.join('、'), idx: idx };
+};
+I.ad = function (G, mode, key) {
+  key = key || String(G.day);
+  if (G.ad.key !== key) { G.ad.key = key; G.ad.used = 0; }
+  if (G.ad.used >= 3) return { ok: false, msg: '今天三次都用完了。' };
+  G.ad.used++;
+  if (mode === 'recruit') return I.recruit(G, true);
+  if (mode === 'scroll') { G.scroll += 3; jlog(G, [P('看完一段，换了 3 卷残卷。', 'good')], 'good'); return { ok: true, msg: '残卷 +3' }; }
+  G.stone += 300000; G.jade += 1;
+  jlog(G, [P('看完一段，领了 30 万灵石和 1 枚仙玉。', 'good')], 'good');
+  return { ok: true, msg: '灵石 +30万 · 仙玉 +1' };
+};
+function questCur(G, q) {
+  if (q.k === 'men2' || q.k === 'men8') return alive(G).length;
+  if (q.k === 'break1' || q.k === 'break6') return G.stat.breaks;
+  if (q.k === 'travel3') return G.stat.travels;
+  if (q.k === 'array1') return G.buildings.array || 0;
+  if (q.k === 'sign7') return G.sign.total;
+  return 0;
+}
+function checkQuest(G) {
+  var guard = 0;
+  while (G.questIdx < QUESTS.length && guard++ < 12) {
+    var q = QUESTS[G.questIdx];
+    if (questCur(G, q) < q.max) break;
+    G.questGot.push(q.k);
+    if (q.reward.indexOf('仙玉') >= 0) G.jade += 2;
+    else if (q.reward.indexOf('玄晶') >= 0) G.purple += 200;
+    else G.stone += 200000;
+    jlog(G, [P('办成了：' + q.n + '。', 'good'), P('领到 ' + q.reward + '。', 'good')], 'good');
+    G.questIdx++;
+  }
+}
+
+/* ---------------- 设置 / 结局 / 存档 ---------------- */
+I.setAuto = function (G, on) { G.auto = !!on; return { ok: true }; };
+I.setSpeed = function (G, n) { G.speed = clamp(n | 0, 1, 4); return { ok: true }; };
+I.dismissOffline = function (G) { G.offline = null; return { ok: true }; };
+I.peekResult = function (G) { G.peek = true; return { ok: true }; };
+
+I.retire = function (G) {
+  if (!G.created) return { ok: false, msg: '还没开门。' };
+  if (G.pending) return { ok: false, msg: '先把眼前这件事了了。' };
+  var top = alive(G).slice().sort(function (a, b) { return b.power - a.power; })[0];
+  var dt = dateOf(G.day);
+  var endKey = G.realm >= 8 ? 'feisheng' : (G.stat.wins >= 3 ? 'yitong' :
+    (pathOf(G).k === 'shang' ? 'fujia' : (pathOf(G).k === 'mo' ? 'chengmo' :
+      (G.stat.breaks <= 1 ? 'pingdan' : 'yinshi'))));
+  var end = null;
+  T.ENDINGS.forEach(function (x) { if (x.k === endKey) end = x; });
+  if (!end) end = T.ENDINGS[T.ENDINGS.length - 1];
+  var taste = ['稳妥派', '赌一把派', '爱看热闹派'][G.stat.chooses.indexOf(Math.max.apply(null, G.stat.chooses))] || '随缘派';
+  var pct = clamp(Math.round((D.POP.ending[endKey] || 0.16) * 100 * (0.6 + (G.comboId % 7) * 0.09)), 1, 47);
+  G.result = {
+    n: end.n, d: end.d, c: end.c, ep: end.ep.replace(/\{name\}/g, G.name).replace(/\{top\}/g, top ? top.name : '大弟子'),
+    years: dt.y, month: dt.m, day: dt.d, gen: G.gen,
+    power: G.power, powerFmt: fmt(G.power), wins: G.stat.wins, loses: G.stat.loses,
+    eggs: G.eggs.length, disciples: alive(G).length, breaks: G.stat.breaks,
+    matchPct: pct + '%', comboId: G.comboId, route: pathOf(G).n + ' · ' + masterOf(G).n,
+    style: taste, top: top ? top.name : '无', topRealm: D.REALMS[clamp(top ? top.realm : 0, 0, 9)].n,
+    eggList: G.eggs.map(function (k) { return T.EGGS[k] ? T.EGGS[k][0] : k; }).slice(0, 10)
+  };
+  G.peek = false;
+  jlog(G, [P('掌门把印放在案上，说：就到这儿吧。', 'good')], 'good');
+  return { ok: true, msg: end.n, result: G.result };
+};
+
+I.restart = function (seed) { return I.create(seed == null ? Date.now() : seed); };
+I.serialize = function (G) {
+  G.savedAt = Date.now();
+  try { return JSON.stringify(G); } catch (e) { return ''; }
+};
+I.load = function (str) {
+  try {
+    var G = JSON.parse(str);
+    if (!G || G.v !== I.VER) return null;
+    if (!G.stat) G.stat = { travels: 0, breaks: 0, recruits: 0, wins: 0, loses: 0, chooses: [0, 0, 0] };
+    if (!G.sign) G.sign = { key: '', streak: 0, total: 0, got: [] };
+    return G;
+  } catch (e) { return null; }
+};
+I.offline = function (G, now) {
+  if (!G.created || !G.savedAt) return null;
+  var hours = Math.min(24, Math.floor((now - G.savedAt) / 3600000));
+  if (hours < 1) return null;
+  var q = qiRateOf(G) * hours * 12;
+  G.qi = Math.min(qiMaxOf(G), G.qi + q);
+  var s = stoneRateOf(G) * hours * 12;
+  G.stone += s;
+  G.day += hours * 3;
+  G.energy = Math.min(60 + G.keys * 10, G.energy + hours * 2);
+  calcPower(G);
+  G.offline = { hours: hours, qi: fmt(q), stone: fmt(s) };
+  return G.offline;
+};
+
+/* ---------------- 榜单 ---------------- */
+function rankList(G) {
+  var r = 1000 + (G.seed % 9000), list = [];
+  for (var i = 0; i < 8; i++) {
+    r = (Math.imul(r, 1664525) + 1013904223) >>> 0;
+    var f = r / 4294967296;
+    list.push({
+      i: i + 1, name: RANK_SUR[(G.seed + i * 3) % RANK_SUR.length] + '家',
+      title: RANK_TITLE[(G.seed + i * 5) % RANK_TITLE.length],
+      power: Math.round(1.2e9 + f * 5.2e12 / (1 + i * 0.55)),
+      mul: (1 + i * 0.1).toFixed(2)
+    });
+  }
+  list.sort(function (a, b) { return b.power - a.power; });
+  list.forEach(function (x, i) { x.i = i + 1; x.powerFmt = fmt(x.power); });
+  return list;
+}
+function sectRank(G) {
+  var r = 200 + (G.seed % 900), list = [];
+  for (var i = 0; i < 8; i++) {
+    r = (Math.imul(r, 1103515245 + i, 12345) + 1) >>> 0;
+    list.push({
+      i: i + 1, name: RANK_SUR[(G.seed + i) % RANK_SUR.length] + '氏宗门',
+      title: pick({ rs: r }, ['名门', '隐宗', '巨擘', '财主']),
+      power: Math.max(20, Math.round(G.fame * (3.2 - i * 0.32) + r % 900)),
+      mul: 'x' + (1 + i * 0.1).toFixed(2)
+    });
+  }
+  list.sort(function (a, b) { return b.power - a.power; });
+  list.forEach(function (x, i) { x.i = i + 1; x.powerFmt = fmt(x.power); });
+  return list;
+}
+
+/* ---------------- 视图 ---------------- */
+function equipView(d) {
+  return EQUIP_SLOTS.map(function (s) {
+    var e = d.equip[s.k];
+    return { k: s.k, n: s.n, icon: s.icon, has: !!e,
+      lv: e ? e.lv : 0, q: e ? e.q : 0, qn: e ? (e.q > 1 ? '上品' : '寻常') : '空',
+      power: e ? fmt((70 + e.lv * 130) * (e.q || 1)) : '', cost: e ? 4 + e.lv * 3 : 8 };
+  });
+}
+function discipleView(G, d, isLead) {
+  var g = d.gen;
+  var attrs = [
+    { k: 'gg', n: '根骨', v: g.gg }, { k: 'fy', n: '福缘', v: g.fy },
+    { k: 'wx', n: '悟性', v: g.wx }, { k: 'zz', n: '剑道资质', v: g.zz },
+    { k: 'ss', n: '神识', v: g.ss }, { k: 'tp', n: '体魄', v: g.tp }
+  ];
+  var max = qiMaxOf(G);
+  return {
+    uid: d.uid, name: d.name, title: d.title, root: d.root, rootC: d.rootC,
+    qn: d.qn, qc: d.qc, star: d.star, trait: d.trait,
+    talent: d.talent, talentD: d.talentD, age: d.age, life: d.life,
+    realm: D.REALMS[clamp(isLead ? G.realm : d.realm, 0, 9)].n,
+    qi: Math.round(isLead ? G.qi : d.qi), qiMax: max,
+    qiPct: clamp(Math.round((isLead ? G.qi : d.qi) / max * 100), 0, 100),
+    qiRate: qiRateOf(G), stoneRate: stoneRateOf(G),
+    power: d.power, powerFmt: fmt(d.power),
+    atk: Math.round(180 + d.gen.zz * 9 + (isLead ? G.qi : 0) * 0.4),
+    def: Math.round(30 + d.gen.tp * 1.1),
+    crit: clamp(Math.round((g.fy * 0.06 + 1.2) * 100) / 100, 0, 60).toFixed(2),
+    critMul: (140 + g.wx * 0.25).toFixed(2), dodge: clamp(3 + g.ss * 0.06, 0, 40).toFixed(2),
+    loyalty: d.loyalty, status: d.status === 'ok' ? '在册' : '已离去',
+    attrs: attrs, attrsMax: 160, equip: equipView(d),
+    tags: [
+      { n: d.qn + '·' + d.root + '灵根', c: d.qc },
+      { n: d.trait, c: '#4a7290' },
+      d.talent ? { n: d.talent, c: '#8a63a8' } : { n: '尚无奇特处', c: '#8b8b7f' },
+      { n: '福泽深厚', c: '#3f7f6a' }
+    ],
+    journal: d.journal.slice(0, 24).map(function (j) {
+      return { date: j.date, parts: j.parts.map(function (p) { return { t: p.t, c: p.c }; }) };
+    }),
+    pet: d.pet || ''
+  };
+}
+I.view = function (G) {
+  var dt = dateOf(G.day), lead = leadOf(G), f = focusOf(G);
+  calcPower(G);
+  var v = {
+    created: G.created, name: G.name, gen: G.gen, comboId: G.comboId,
+    date: dt.str, year: dt.y, month: dt.m, dayN: dt.d,
+    jade: G.jade, jadeFmt: fmt(G.jade), stone: G.stone, stoneFmt: fmt(G.stone),
+    purple: G.purple, purpleFmt: fmt(G.purple), herb: G.herb, ore: G.ore, scroll: G.scroll,
+    fame: Math.round(G.fame), fameFmt: fmt(G.fame),
+    energy: G.energy, keys: G.keys, energyText: G.energy + '/' + G.keys,
+    power: G.power, powerFmt: fmt(G.power), realm: D.REALMS[clamp(G.realm, 0, 9)].n,
+    realmIdx: G.realm, qi: Math.round(G.qi), qiMax: qiMaxOf(G),
+    qiPct: clamp(Math.round(G.qi / qiMaxOf(G) * 100), 0, 100), qiRate: qiRateOf(G),
+    qiReady: G.qi >= qiMaxOf(G), stoneRate: stoneRateOf(G),
+    alive: alive(G).length, cap: G.cap, genName: pathOf(G).n,
+    masterName: masterOf(G).n, partnerName: partnerOf(G).n,
+    lead: lead ? discipleView(G, lead, true) : null,
+    focus: f ? discipleView(G, f, f.uid === G.lead) : null,
+    disciples: G.disciples.filter(function (d) { return d.status === 'ok'; }).map(function (d) {
+      return { uid: d.uid, name: d.name, root: d.root, rootC: d.rootC, qn: d.qn, qc: d.qc,
+        realm: D.REALMS[clamp(d.uid === G.lead ? G.realm : d.realm, 0, 9)].n,
+        power: fmt(d.power), on: G.formation.indexOf(d.uid) >= 0, isLead: d.uid === G.lead };
+    }),
+    pending: G.pending ? {
+      t: G.pending.t, who: G.pending.who, x: G.pending.x, tag: G.pending.tag,
+      guest: G.pending.guest, guestRealm: G.pending.guestRealm, date: G.pending.date,
+      leadName: lead ? lead.name : '', leadRealm: D.REALMS[clamp(G.realm, 0, 9)].n,
+      opts: G.pending.opts.map(function (o, i) { return { i: i, n: o.n, d: o.d, pop: o.pop }; })
+    } : null,
+    journal: G.journal.slice(0, 40).map(function (j) {
+      return { date: j.date, k: j.k, parts: j.parts.map(function (p) { return { t: p.t, c: p.c }; }) };
+    }),
+    sign: { key: G.sign.key, streak: G.sign.streak, total: G.sign.total,
+      got: G.sign.got.slice(), days: SIGN.map(function (a, i) {
+        return { i: i + 1, got: !!G.sign.got[i], items: a.map(function (x) {
+          return { k: x.k, n: x.n, v: fmt(x.v), c: x.k === 'purple' ? 'purple' : (x.k === 'stone' ? 'blue' : 'green') };
+        }) };
+      }) },
+    quest: G.questIdx < QUESTS.length ? (function () {
+      var q = QUESTS[G.questIdx];
+      return { n: q.n, cur: Math.min(q.max, questCur(G, q)), max: q.max, reward: q.reward,
+        pct: clamp(Math.round(questCur(G, q) / q.max * 100), 0, 100) };
+    })() : { n: '这一轮目标都办完了', cur: 1, max: 1, reward: '—', pct: 100 },
+    rank: rankList(G), sectRank: sectRank(G), myRank: 0, myPowerFmt: fmt(G.power),
+    myFameFmt: fmt(G.fame),
+    buildings: D.BUILDINGS.map(function (b) {
+      var lv = G.buildings[b.k] || 0, c = buildCost(G, b);
+      var locked = b.k !== 'dorm' && b.k !== 'hall' && lv >= (G.buildings.hall || 0) + D.LEVELS[0].cap;
+      return { k: b.k, n: b.n, icon: b.icon, d: b.d, lv: lv, max: b.max,
+        costStone: fmt(c.stone), costOre: c.ore, locked: locked,
+        can: lv < b.max && !locked && G.stone >= c.stone && G.ore >= c.ore,
+        out: b.d };
+    }),
+    tasks: D.TASKS.map(function (t) {
+      return { k: t.k, n: t.n, icon: t.icon, d: t.d, can: G.energy >= 3,
+        gain: Object.keys(t.gain).map(function (k2) {
+          return ({ stone: '灵石', herb: '药材', ore: '矿石', fame: '声望', scroll: '残卷', qi: '修为', grow: '修炼' })[k2] || k2;
+        }).join(' · ') };
+    }),
+    shop: D.ITEMS.slice(0, 8).map(function (it) {
+      return { k: it.k, n: it.n, d: it.d, price: fmt(it.price * 40), can: G.stone >= it.price * 40 };
+    }),
+    enemies: D.ENEMIES.map(function (en) {
+      return { k: en.k, n: en.n, d: en.d, can: G.fame >= en.minLv * 60 };
+    }),
+    dao: DAO.map(function (x) { return { k: x.k, n: x.n, d: x.d, cost: x.cost, got: hasDao(G, x.k), can: G.scroll >= x.cost }; }),
+    pets: PETS.map(function (x) { return { k: x.k, n: x.n, d: x.d, cost: x.cost, got: hasPet(G, x.k), can: G.herb >= x.cost }; }),
+    formation: (function () {
+      var cells = [];
+      for (var i = 0; i < 9; i++) {
+        var uid = G.formation[i];
+        var d = null;
+        G.disciples.forEach(function (x2) { if (x2.uid === uid) d = x2; });
+        cells.push(d ? { uid: d.uid, name: d.name, root: d.root, rootC: d.rootC, qc: d.qc } : { uid: 0, name: '', root: '', qc: '' });
+      }
+      return { cells: cells, on: G.formation.length, bonus: G.formation.length * 6 };
+    })(),
+    eggs: G.eggs.map(function (k) { return T.EGGS[k] ? { n: T.EGGS[k][0], x: T.EGGS[k][1] } : { n: k, x: '' }; }),
+    stat: { travels: G.stat.travels, breaks: G.stat.breaks, wins: G.stat.wins, loses: G.stat.loses, eggs: G.eggs.length },
+    ad: { used: G.ad.used, left: 3 - G.ad.used }, auto: G.auto, speed: G.speed,
+    offline: G.offline, result: (G.result && !G.peek) ? G.result : null,
+    resultDone: !!G.result,
+    tips: T.TIPS.slice(0, 8)
+  };
+  // 玩家能否挤进榜单（宗门榜按声望）
+  var sr = v.sectRank;
+  var my = G.fame;
+  for (var i2 = 0; i2 < sr.length; i2++) if (my > sr[i2].power) { v.mySectRank = i2 + 1; break; }
+  if (!v.mySectRank) v.mySectRank = 0;
+  return v;
+};
+
+I.EQUIP_SLOTS = EQUIP_SLOTS;
+I.DAO = DAO;
+I.PETS = PETS;
+I.SIGN = SIGN;
+I.QUESTS = QUESTS;
+module.exports = I;
+
+});</script>
+<script>/* 破山门 · 宗门模拟器界面（按六张实机截图的架构复刻，文案与美术均自写） */
+var D = __req('sect-data');
+var T = __req('sect-story');
+var I = __req('sect-idle');
+
+var G = null;
+var panel = '';            // 当前面板
+var sub = 'attr';          // 弟子子页 attr / dao / pet / log
+var rankTab = 0;           // 0 个人榜 / 1 宗门榜
+var pickBuf = { name: '破山门', path: 'zheng', master: 'zhen', partner: 'yi' };
+var adMode = 'recruit';
+var warLines = null, warTitle = '', warWin = false;
+var lastKey = '?', toastTimer = null, autoAcc = 0, saveAcc = 0, tickTimer = null;
+var STORAGE_OK = true;      // 网吧机可能禁掉 localStorage
+var saveBox = null;         // null = 显示当前存档码；字符串 = 用户正在编辑/粘贴
+var SAVE_TAG = 'PSM-SAVE-1|';
+var UI = {};
+
+function $(id) { return document.getElementById(id); }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function fmt(n) { return I.fmt(n); }
+function parts(pp) {
+  return (pp || []).map(function (p) { return '<span class="' + esc(p.c) + '">' + esc(p.t) + '</span>'; }).join('');
+}
+function toast(msg) {
+  if (!msg) return;
+  var el = $('toast'); el.textContent = msg; el.className = 'toast on';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { el.className = 'toast'; }, 1900);
+}
+function save() { try { localStorage.setItem(I.SAVE_KEY, I.serialize(G)); } catch (e) {} }
+function load() {
+  try {
+    var raw = localStorage.getItem(I.SAVE_KEY);
+    if (raw) { var g = I.load(raw); if (g) return g; }
+  } catch (e) {}
+  return I.create(Date.now());
+}
+function dayKey() { return String(new Date().toDateString()); }
+
+/* ---------------- 存档码：网吧/公共电脑跨机续玩 ----------------
+ * 进度本来存在 localStorage，但网吧有还原卡、重启即清空。
+ * 这里把同一份 serialize 结果包成可带走的文件 / 文本，导入时走同一份 load。
+ */
+function storageOK() {
+  try {
+    localStorage.setItem('__psm_probe__', '1');
+    localStorage.removeItem('__psm_probe__');
+    return true;
+  } catch (e) { return false; }
+}
+function saveText() { return SAVE_TAG + I.serialize(G); }
+function parseSave(txt) {
+  var s = String(txt == null ? '' : txt).replace(/^\uFEFF/, '').trim();
+  if (s.indexOf(SAVE_TAG) === 0) s = s.slice(SAVE_TAG.length);
+  if (s.charAt(0) !== '{') return null;
+  var g = I.load(s);
+  return (g && g.created) ? g : null;
+}
+function fileName() {
+  var d = new Date();
+  function p(n) { return (n < 10 ? '0' : '') + n; }
+  return '破山门_存档_' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '_' + p(d.getHours()) + p(d.getMinutes()) + '.txt';
+}
+
+/* ---------------- 自绘头像（无外部图片） ---------------- */
+function avatar(kind) {
+  var f = kind === 'f';
+  var hair = f ?
+    '<path d="M25 44 Q22 14 50 13 Q78 14 75 44 L75 88 Q70 66 66 60 L34 60 Q30 66 25 88 Z" fill="#2c2b34"/>' :
+    '<path d="M27 42 Q26 15 50 15 Q74 15 73 42 L70 33 Q60 27 50 29 Q39 27 30 35 Z" fill="#2b2b33"/>';
+  var bun = f ?
+    '<ellipse cx="50" cy="12" rx="13" ry="8" fill="#2c2b34"/><circle cx="63" cy="15" r="4" fill="#e3b95f"/>' :
+    '<path d="M40 17 Q42 2 50 3 Q58 2 60 17 Z" fill="#2b2b33"/><rect x="43" y="13" width="14" height="4" rx="2" fill="#c9a24c"/>';
+  return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+    '<circle cx="50" cy="50" r="50" fill="#e5f3e0"/>' +
+    '<path d="M14 100 Q17 76 50 73 Q83 76 86 100 Z" fill="' + (f ? '#8a5f8f' : '#2f7f6d') + '"/>' +
+    '<path d="M42 70 L50 82 L58 70 Z" fill="#f0e2c9"/>' + hair +
+    '<ellipse cx="50" cy="47" rx="21" ry="25" fill="#f8ddbe"/>' + bun +
+    '<path d="M30 40 Q34 27 50 27 Q66 27 70 40 L67 35 Q58 32 50 33 Q40 32 33 36 Z" fill="#2b2b33"/>' +
+    '<path d="M38 46 Q42 43 46 46" stroke="#3a3030" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+    '<path d="M54 46 Q58 43 62 46" stroke="#3a3030" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+    '<circle cx="42" cy="49" r="2.2" fill="#2f2b2b"/><circle cx="58" cy="49" r="2.2" fill="#2f2b2b"/>' +
+    '<path d="M46 59 Q50 62 54 59" stroke="#bb755a" stroke-width="1.8" fill="none" stroke-linecap="round"/>' +
+    '<path d="M50 73 L44 82 L50 88 L56 82 Z" fill="' + (f ? '#c98fb0' : '#f2e5c9') + '"/>' +
+    '</svg>';
+}
+function ph(kind, cls) { return '<div class="' + (cls || '') + '">' + avatar(kind) + '</div>'; }
+
+/* ---------------- 动作包装 ---------------- */
+function after(r, silent) {
+  if (!r) return;
+  if (!r.ok) toast(r.msg);
+  else if (!silent && r.msg) toast(r.msg);
+  save(); render();
+}
+function render() {
+  var v = I.view(G);
+  renderHud(v);
+  var k = modalKey(v);
+  renderModal(v, k);
+}
+function modalKey(v) {
+  if (!v.created) return 'setup';
+  if (v.pending) return 'pending';
+  if (v.result) return 'result';
+  if (v.offline) return 'offline';
+  return panel;
+}
+function open(p) { panel = p; render(); }
+function close() { panel = ''; render(); }
+
+/* ---------------- 主界面 ---------------- */
+function renderHud(v) {
+  var d = v.lead;
+  $('top').innerHTML =
+    '<div class="tr">' +
+      '<div class="ava" onclick="UI.openDisc(' + (d ? d.uid : 0) + ')" style="cursor:pointer">' + avatar('m') +
+        '<span class="gear">设</span></div>' +
+      '<div class="who"><div class="nm">' + esc(v.name) + '</div>' +
+        '<div class="sub">衣裳 ' + v.alive + '/' + v.cap + '人 · <em>' + esc(v.date) + '</em></div>' +
+        '<div class="sub">第 ' + v.gen + ' 代 · ' + esc(v.genName) + ' · ' + esc(v.realm) + '</div></div>' +
+      '<div class="cash">' +
+        '<span class="pill"><i class="dot-g"></i>' + v.jadeFmt + '</span>' +
+        '<span class="pill blue"><i class="dot-b"></i>' + v.stoneFmt + '</span></div>' +
+    '</div>' +
+    '<div class="caps"><span class="cap"><span>•••</span><i></i></span></div>' +
+    '<div class="hud2">' +
+      '<div class="pw" onclick="UI.openDisc(' + (d ? d.uid : 0) + ')" style="cursor:pointer">' +
+        '<span class="ico">战</span><b>战力 ' + esc(v.powerFmt) + '</b></div>' +
+      '<div class="qbtns">' +
+        '<div class="qbtn" onclick="UI.open(\'rank\')"><span class="g">榜</span>排行<span class="dot"></span></div>' +
+        '<div class="qbtn" onclick="UI.openDisc(' + (d ? d.uid : 0) + ')"><span class="g">徒</span>弟子<span class="dot"></span></div>' +
+        '<div class="qbtn" onclick="UI.open(\'sect\')"><span class="g">宗</span>宗门<span class="dot"></span></div>' +
+      '</div>' +
+    '</div>';
+
+  $('stage').innerHTML =
+    '<div class="bird">⌁　⌁　⌁</div>' +
+    '<div class="hero" onclick="UI.openDisc(' + (d ? d.uid : 0) + ')">' +
+      '<div class="ring"><span class="leaf l"></span><span class="leaf r"></span>' + avatar('m') + '</div>' +
+      '<div class="rlm">' + esc(v.realm) + (v.realmIdx ? ' · ' + (v.realmIdx + 1) + '阶' : '7阶') + '</div>' +
+      '<div class="pw2">战力 ' + esc(v.powerFmt) + ' · ' + esc(v.name) + '</div>' +
+      '<div class="float">修为 +' + v.qiRate + '</div>' +
+      '<div class="float">灵石 +' + v.stoneRate + '</div>' +
+      '<div class="float">' + (v.qiReady ? '可突破！' : '修炼中…') + '</div>' +
+    '</div>' +
+    '<div class="lamp"></div><div class="stone"></div>';
+
+  $('sideL').innerHTML =
+    '<div class="cbtn" onclick="UI.open(\'sign\')"><span class="g">簽</span><span class="t">每日签到</span><span class="red"></span></div>' +
+    '<div class="cbtn" onclick="UI.open(\'ad\')"><span class="g">緣</span><span class="t">机缘奖励</span><span class="red"></span></div>';
+  $('sideR').innerHTML =
+    '<div class="cbtn sq" onclick="UI.breakthrough()"><span class="g">破</span><span class="t">一键突破</span></div>' +
+    '<div class="cbtn sq" onclick="UI.open(\'settings\')"><span class="g">设</span><span class="t">游历设置</span></div>';
+
+  $('quest').innerHTML =
+    '<span class="qi">卷</span><div class="qtx"><div class="qt">' + esc(v.quest.n) + '</div>' +
+      '<div class="qb"><i style="width:' + v.quest.pct + '%"></i></div></div>' +
+    '<span class="qn">' + v.quest.cur + '/' + v.quest.max + '</span>';
+
+  var nav = [
+    ['rank', '榜', '排行', 'ribbon'], ['formation', '阵', '布阵', ''],
+    ['travel', '', '', ''], ['cave', '府', '洞府', ''], ['world', '界', '世界', '']
+  ];
+  $('dock').innerHTML = nav.map(function (n) {
+    if (n[0] === 'travel') {
+      return '<div class="big" onclick="UI.travel()"><div class="in">' + avatar('m') + '</div>' +
+        '<div class="lb">游历 <b>' + esc(v.energyText) + '</b></div></div>';
+    }
+    return '<div class="it' + (panel === n[0] ? ' on' : '') + '" onclick="UI.open(\'' + n[0] + '\')">' +
+      '<div class="ic ' + n[3] + '">' + n[1] + '</div>' + n[2] + '</div>';
+  }).join('');
+}
+
+/* ---------------- 弹层分发 ---------------- */
+function renderModal(v, k) {
+  lastKey = k;
+  var el = $('modal'), sh = $('shade');
+  if (!k) { sh.className = 'shade'; el.className = 'modal'; el.innerHTML = ''; return; }
+  sh.className = 'shade on'; el.className = 'modal on';
+  var h = '';
+  if (k === 'setup') h = setupHtml(v);
+  else if (k === 'pending') h = pendingHtml(v);
+  else if (k === 'result') h = resultHtml(v);
+  else if (k === 'offline') h = offlineHtml(v);
+  else if (k === 'disciple') h = discipleHtml(v);
+  else if (k === 'sign') h = signHtml(v);
+  else if (k === 'rank') h = rankHtml(v);
+  else if (k === 'cave') h = caveHtml(v);
+  else if (k === 'world') h = worldHtml(v);
+  else if (k === 'formation') h = formationHtml(v);
+  else if (k === 'sect') h = sectHtml(v);
+  else if (k === 'settings') h = settingsHtml(v);
+  else if (k === 'ad') h = adHtml(v);
+  else if (k === 'war') h = warHtml(v);
+  if (!h) { sh.className = 'shade'; el.className = 'modal'; el.innerHTML = ''; return; }
+  el.innerHTML = '<div class="mwrap">' + h + '</div>';
+}
+function xclose() { return '<div class="xclose" onclick="UI.close()"><b>×</b></div>'; }
+function dpTitle(t) { return '<div class="dp"><div class="ttl">' + esc(t) + '</div>'; }
+function sec(t, q) { return '<div class="secbar">' + esc(t) + (q ? '<span class="qm">?</span>' : '') + '</div>'; }
+
+/* ---------------- 开局 ---------------- */
+function setupHtml() {
+  var h = '<div class="card setup"><h2>破 山 门</h2>' +
+    '<div class="lead">开局一间破殿，一个弟子，一块歪匾。<br>往后是仙宗还是荒地，你自己走出来。</div>' +
+    '<div class="fld">宗门叫什么（最多 8 个字）</div>' +
+    '<input class="inp" id="sectName" maxlength="8" value="' + esc(pickBuf.name) + '" oninput="UI.setName(this.value)">' +
+    '<div class="fld">走哪条路</div><div class="pick">' + D.PATHS.map(function (p) {
+      return '<div class="pk' + (pickBuf.path === p.k ? ' on' : '') + '" onclick="UI.pick(\'path\',\'' + p.k + '\')">' +
+        '<div class="t">' + esc(p.icon) + ' · ' + esc(p.n) + '</div><div class="d">' + esc(p.d.slice(0, 26)) + '…</div></div>';
+    }).join('') + '</div>' +
+    '<div class="fld">请谁当开山长老</div><div class="pick">' + D.MASTERS.map(function (m) {
+      return '<div class="pk' + (pickBuf.master === m.k ? ' on' : '') + '" onclick="UI.pick(\'master\',\'' + m.k + '\')">' +
+        '<div class="t">' + esc(m.n) + '</div><div class="d">' + esc(m.d) + '</div></div>';
+    }).join('') + '</div>' +
+    '<div class="fld">道侣（也能先不找）</div><div class="pick">' + D.PARTNERS.map(function (p) {
+      return '<div class="pk' + (pickBuf.partner === p.k ? ' on' : '') + '" onclick="UI.pick(\'partner\',\'' + p.k + '\')">' +
+        '<div class="t">' + esc(p.n) + '</div><div class="d">' + esc(p.d) + '</div></div>';
+    }).join('') + '</div>' +
+    '<div class="foot"><button class="btn gold" onclick="UI.start()">开 门</button></div></div>';
+  return h;
+}
+
+/* ---------------- 事件（截图第二屏） ---------------- */
+function tagTitle(t) {
+  return { '开局': '道友', '日常': '见闻', '经营': '机缘', '奇遇': '奇遇', '弟子': '门人', '宗门': '宗务' }[t] || t;
+}
+function pendingHtml(v) {
+  var p = v.pending;
+  return '<div class="ev">' +
+    '<div class="cap"><div class="sun"></div>' +
+      '<svg viewBox="0 0 400 36" preserveAspectRatio="none"><path fill="#9c5c24" opacity=".55" d="M0 36 L0 22 L34 8 L58 22 L86 12 L120 28 L160 6 L196 24 L232 10 L270 26 L306 8 L344 22 L374 12 L400 26 L400 36 Z"/></svg>' +
+      '<div class="ttl">' + esc(tagTitle(p.tag)) + '</div>' +
+      '<div class="eye" onclick="UI.eye()">◉</div></div>' +
+    '<div class="pair">' +
+      '<div class="one"><div class="ph">' + avatar('m') + '</div><div class="n">' + esc(p.leadName) + '</div>' +
+        '<div class="r">' + esc(p.leadRealm) + '</div></div>' +
+      '<div class="one"><div class="ph">' + avatar('f') + '</div><div class="n">' + esc(p.guest) + '</div>' +
+        '<div class="r">' + esc(p.guestRealm) + '</div></div>' +
+    '</div>' +
+    '<div class="body">' + esc(p.x) + '</div>' +
+    p.opts.map(function (o) {
+      return '<button class="opt" onclick="UI.choose(' + o.i + ')">' + esc(o.n) +
+        '<small>' + o.pop + '% 的人选过 · ' + esc(o.d) + '</small></button>';
+    }).join('') +
+    '<div class="foot">' + esc(p.date) + ' · ' + esc(p.who) + '</div></div>';
+}
+
+/* ---------------- 弟子（截图第三、四屏） ---------------- */
+function radar(vals) {
+  var cx = 95, cy = 79, R = 60;
+  function pt(i, r) {
+    var a = -Math.PI / 2 + i * Math.PI / 3;
+    return [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
+  }
+  function poly(r) { return [0, 1, 2, 3, 4, 5].map(function (i) { return pt(i, r).map(function (x) { return x.toFixed(1); }).join(','); }).join(' '); }
+  var s = '<svg viewBox="0 0 190 158">';
+  [0.33, 0.66, 1].forEach(function (f) {
+    s += '<polygon points="' + poly(R * f) + '" fill="none" stroke="#8fc9b4" stroke-width="1.2"/>';
+  });
+  [0, 1, 2, 3, 4, 5].forEach(function (i) {
+    var p = pt(i, R);
+    s += '<line x1="' + cx + '" y1="' + cy + '" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="#a8d6c4" stroke-width="1"/>';
+  });
+  var dp = vals.map(function (n, i) { return pt(i, R * Math.max(0.08, Math.min(1, n / 160))).map(function (x) { return x.toFixed(1); }).join(','); }).join(' ');
+  s += '<polygon points="' + dp + '" fill="rgba(58,158,124,.38)" stroke="#2e8a68" stroke-width="2"/>';
+  var names = ['根骨', '福缘', '悟性', '资质', '神识', '体魄'];
+  [0, 1, 2, 3, 4, 5].forEach(function (i) {
+    var p = pt(i, R + 15);
+    s += '<text x="' + p[0].toFixed(1) + '" y="' + (p[1] + 3).toFixed(1) + '" font-size="10" fill="#9a6a2c" text-anchor="middle">' + names[i] + '</text>';
+    var p2 = pt(i, R + 2);
+    s += '<text x="' + p2[0].toFixed(1) + '" y="' + (p2[1] - 4).toFixed(1) + '" font-size="9" fill="#2e7f62" text-anchor="middle">' + vals[i] + '</text>';
+  });
+  return s + '</svg>';
+}
+function subtabsHtml() {
+  return '<div class="subtabs">' + [['attr', '属性'], ['dao', '道种'], ['pet', '灵宠'], ['log', '日志']].map(function (s) {
+    return '<div class="' + (sub === s[0] ? 'on' : '') + '" onclick="UI.sub(\'' + s[0] + '\')">' + s[1] + '</div>';
+  }).join('') + '</div>';
+}
+/* 日志单独占一整屏，对齐截图的「修行日志」页 */
+function discipleLogHtml(v, d) {
+  var js = v.journal;
+  var h = dpTitle(d.title + ' · ' + d.name) + '<div class="inner">' + sec('修行日志', true);
+  h += js.slice(0, 18).map(function (j) {
+    return '<div class="jlog"><span class="dt">' + esc(j.date) + '</span>' +
+      '<div class="tx">' + parts(j.parts) + '</div></div>';
+  }).join('');
+  if (!js.length) h += '<div class="mini">还没有记事，出去走两趟就有了。</div>';
+  h += '</div>' + subtabsHtml() +
+    '<div class="inner"><div class="mini">按仙历倒着排。人名、好事、坏事、彩蛋各用一种颜色；点上面页签回属性页。</div></div>';
+  return h + '</div>' + xclose();
+}
+function discipleHtml(v) {
+  var d = v.focus || v.lead;
+  if (!d) return '';
+  if (sub === 'log') return discipleLogHtml(v, d);
+  var h = dpTitle(d.title + ' · ' + d.name) + '<div class="inner">';
+  h += '<div class="dtop"><div class="ph">' + avatar('m') + '</div><div class="l">' +
+    '<div class="pwb">战力 ' + esc(d.powerFmt) + '</div>' +
+    '<div class="rate">+' + d.stoneRate + ' 灵石 / 秒　·　+' + d.qiRate + ' 修为 / 秒</div></div></div>';
+  h += '<div class="grid3">' +
+    '<div class="cell"><div class="k">年龄</div><div class="v">' + d.age + '</div></div>' +
+    '<div class="cell"><div class="k">寿元</div><div class="v">' + d.life + '</div></div>' +
+    '<div class="cell"><div class="k">气力</div><div class="v">' + fmt(d.qi * 5 + 1200) + '</div></div>' +
+    '<div class="cell"><div class="k">强击率</div><div class="v b">' + d.crit + '%</div></div>' +
+    '<div class="cell"><div class="k">攻击</div><div class="v">' + fmt(d.atk) + '</div></div>' +
+    '<div class="cell"><div class="k">强击倍数</div><div class="v">' + d.critMul + '%</div></div>' +
+    '<div class="cell"><div class="k">防御</div><div class="v">' + d.def + '</div></div>' +
+    '<div class="cell"><div class="k">闪避率</div><div class="v b">' + d.dodge + '%</div></div>' +
+    '<div class="cell"><div class="k">忠诚</div><div class="v r">' + d.loyalty + '</div></div>' +
+    '</div>';
+  h += '<div class="qiline"><span>' + esc(d.realm) + '</span><div class="bar"><i style="width:' + d.qiPct + '%"></i>' +
+    '<span>修为 ' + d.qi + '/' + d.qiMax + '</span></div><span class="plus">+' + d.qiRate * 30 + '/月</span></div>';
+  h += sec('先天属性', true);
+  h += '<div style="display:flex;align-items:center;gap:4px">' +
+    '<div class="radar">' + radar(d.attrs.map(function (a) { return a.v; })) + '</div>' +
+    '<div class="tags">' + d.tags.map(function (t) {
+      return '<span class="tagchip" style="background:' + esc(t.c) + '">' + esc(t.n) + '</span>';
+    }).join('') + '</div></div>';
+  h += sec('装备', true) + '<div class="eq">';
+  h += d.equip.map(function (e) {
+    return '<div class="slot' + (e.has ? ' has' : '') + '" onclick="UI.equip(\'' + e.k + '\')">' +
+      (e.lv ? '<span class="lv">+' + e.lv + '</span>' : '') +
+      '<span class="g">' + esc(e.icon) + '</span><span class="n">' + esc(e.has ? e.n : e.n) + '</span></div>';
+  }).join('') + '</div></div>';
+  h += subtabsHtml() + '<div class="inner">';
+  if (sub === 'attr') {
+    h += '<div class="grid2">' + d.attrs.map(function (a) {
+      return '<div class="cell"><div class="k">' + esc(a.n) + '</div><div class="v">' + a.v + '</div></div>';
+    }).join('') + '</div>';
+    h += '<div class="hr"></div><div class="kv"><span>隐藏天赋</span><b>' + (d.talent ? esc(d.talent) : '暂未看出') + '</b></div>' +
+      (d.talent ? '<div class="mini">' + esc(d.talentD) + '</div>' : '') +
+      '<div class="kv"><span>灵宠</span><b>' + (d.pet ? esc(d.pet) : '无') + '</b></div>' +
+      '<div class="kv"><span>状态</span><b>' + esc(d.status) + '</b></div>';
+    h += '<div class="hr"></div><div class="mini" style="margin-bottom:6px">点名字换一个弟子看：</div>' +
+      '<div class="grid2">' + v.disciples.map(function (x) {
+        return '<button class="btn sm' + (x.uid === d.uid ? ' pri' : '') + '" onclick="UI.openDisc(' + x.uid + ')">' +
+          esc(x.name) + ' · ' + esc(x.qn) + '</button>';
+      }).join('') + '</div>';
+  } else if (sub === 'dao') {
+    h += '<div class="mini" style="margin-bottom:7px">现有残卷 ' + v.scroll + ' 卷 · 种下的道种全宗门都沾光</div>' +
+      v.dao.map(function (x) {
+        return '<div class="listrow"><div class="g"><div class="nm">' + esc(x.n) + (x.got ? ' ✓' : '') + '</div>' +
+          '<div class="ds">' + esc(x.d) + ' · ' + x.cost + ' 卷</div></div>' +
+          '<button class="btn sm ' + (x.got ? '' : 'gold') + '" ' + (x.got || !x.can ? 'disabled' : '') +
+          ' onclick="UI.dao(\'' + x.k + '\')">' + (x.got ? '已种' : '种下') + '</button></div>';
+      }).join('');
+  } else if (sub === 'pet') {
+    h += '<div class="mini" style="margin-bottom:7px">现有药材 ' + v.herb + '</div>' +
+      v.pets.map(function (x) {
+        return '<div class="listrow"><div class="g"><div class="nm">' + esc(x.n) + (x.got ? ' ✓' : '') + '</div>' +
+          '<div class="ds">' + esc(x.d) + ' · ' + x.cost + ' 药材</div></div>' +
+          '<button class="btn sm ' + (x.got ? '' : 'pri') + '" ' + (x.got || !x.can ? 'disabled' : '') +
+          ' onclick="UI.pet(\'' + x.k + '\')">' + (x.got ? '在院里' : '带回') + '</button></div>';
+      }).join('');
+  } else {
+    var js = d.journal.length ? d.journal : v.journal;
+    h += '<div class="mini" style="margin-bottom:7px">修行日志 · 最近 ' + js.length + ' 条</div>' +
+      js.map(function (j) {
+        return '<div class="jlog"><span class="dt">' + esc(j.date) + '</span><div class="tx">' + parts(j.parts) + '</div></div>';
+      }).join('');
+  }
+  h += '</div></div>' + xclose();
+  return h;
+}
+
+/* ---------------- 签到（截图第五屏） ---------------- */
+function signHtml(v) {
+  var s = v.sign, todayKey = dayKey();
+  var got = s.key === todayKey;
+  var h = '<div class="signwrap"><div class="ttl">每日签到</div><div class="in"><div class="signgrid">';
+  h += s.days.map(function (d) {
+    var seven = d.i === 7 ? ' seven' : '';
+    return '<div class="sday' + seven + '"><div class="dh">' + (seven ? '第 7 天' : '第 ' + d.i + ' 天') + '</div>' +
+      '<div class="ii">' + d.items.map(function (it) {
+        return '<div class="ic ' + it.c + '">' + esc(it.v) + (d.got ? '<span class="ok">✓</span>' : '') + '</div>';
+      }).join('') + '</div></div>';
+  }).join('');
+  h += '</div><div class="signfoot"><span class="done">' + (got ? '今日已签到' : '今日可签到') + '</span>' +
+    '<span class="stamp" onclick="UI.sign()" style="cursor:pointer">补签<br>领奖</span></div>' +
+    '<div class="mini" style="text-align:center;margin-top:4px">连签 ' + s.streak + ' 天 · 累计 ' + s.total + ' 天 · 奖励 ' + esc(v.quest.reward) + '</div>' +
+    '</div></div>' + xclose();
+  return h;
+}
+
+/* ---------------- 排行榜（截图第六屏） ---------------- */
+function rankHtml(v) {
+  var list = rankTab ? v.sectRank : v.rank;
+  var top3 = list.slice(0, 3), rest = list.slice(3);
+  var order = [1, 0, 2]; // 2 名 / 1 名 / 3 名
+  var h = '<div class="rankwrap"><h2>排行榜</h2>' +
+    '<div class="note">' + (rankTab ? '宗门榜按声望排，每天凌晨刷新' : '排行榜将于每日凌晨 2 点刷新，前三名可获得丰厚奖励') + '</div>' +
+    '<div class="podium">' + order.map(function (idx) {
+      var p = top3[idx]; if (!p) return '';
+      var cls = idx === 0 ? 'one' : (idx === 1 ? 'two' : 'three');
+      return '<div class="p ' + cls + '">' + (idx === 0 ? '<div class="crown">▲</div>' : '') +
+        '<div class="rk">第 ' + p.i + ' 名</div><div class="ph">' + avatar(idx === 2 ? 'f' : 'm') + '</div>' +
+        '<div class="nm">' + esc(p.title) + '<br>' + esc(p.name) + '</div>' +
+        '<div class="pw">战力 ' + esc(p.powerFmt) + '</div><div class="mul">' + esc(p.mul) + '</div></div>';
+    }).join('') + '</div><div class="rlist">' +
+    rest.map(function (p) {
+      return '<div class="row"><span class="no">' + p.i + '</span><div class="ph">' + avatar(p.i % 2 ? 'm' : 'f') + '</div>' +
+        '<span class="nm">' + esc(p.title) + esc(p.name) + '</span>' +
+        '<span class="pw">战力 ' + esc(p.powerFmt) + '</span></div>';
+    }).join('') + '</div>' +
+    '<div class="mybar"><div class="ph">' + avatar('m') + '</div><div class="tx">' +
+      (v.mySectRank ? '本宗上榜 · 第 ' + v.mySectRank + ' 名' : '未上榜 · 昨日排名') +
+      '<b>' + esc(v.name) + '的衣裳</b></div><div class="pw">战力 ' + esc(v.myPowerFmt) + '</div></div>' +
+    '<div class="rankfoot"><span class="ar l" onclick="UI.rankTab(0)">◀</span>' +
+      '<div class="t">' + (rankTab ? '个人榜' : '宗门榜') + '</div><div class="dots">● ○</div>' +
+      '<span class="ar r" onclick="UI.rankTab(1)">▶</span></div></div>' + xclose();
+  return h;
+}
+
+/* ---------------- 布阵 / 洞府 / 世界 ---------------- */
+function formationHtml(v) {
+  var f = v.formation;
+  var h = dpTitle('布 阵') + '<div class="inner">' +
+    '<div class="mini" style="margin-bottom:8px">上阵 ' + f.on + '/5 人 · 全宗战力 +' + f.bonus + '% · 点格子把人撤下来</div>' +
+    '<div class="eq" style="grid-template-columns:repeat(3,1fr);gap:8px">' +
+    f.cells.map(function (c, i) {
+      return '<div class="slot' + (c.uid ? ' has' : '') + '" style="aspect-ratio:1/1;min-height:64px" ' +
+        (c.uid ? 'onclick="UI.formation(' + c.uid + ')"' : '') + '>' +
+        (c.uid ? '<span class="g" style="font-size:15px;color:' + esc(c.rootC) + '">' + esc(c.root) + '</span>' +
+          '<span class="n">' + esc(c.name) + '</span>' : '<span class="g" style="opacity:.35">+</span><span class="n">空位 ' + (i + 1) + '</span>') +
+        '</div>';
+    }).join('') + '</div><div class="hr"></div>' + sec('在册弟子') +
+    v.disciples.map(function (d) {
+      return '<div class="listrow" onclick="UI.formation(' + d.uid + ')"><div class="g">' +
+        '<div class="nm">' + esc(d.name) + ' <span class="pill2" style="background:' + esc(d.qc) + '">' + esc(d.qn) + '</span></div>' +
+        '<div class="ds">' + esc(d.root) + '灵根 · ' + esc(d.realm) + ' · 战力 ' + esc(d.power) + '</div></div>' +
+        '<span class="btn sm ' + (d.on ? 'pri' : '') + '">' + (d.on ? '下阵' : '上阵') + '</span></div>';
+    }).join('') + '</div></div>' + xclose();
+  return h;
+}
+function caveHtml(v) {
+  var h = dpTitle('洞 府') + '<div class="inner">' +
+    '<div class="mini" style="margin-bottom:8px">灵石 ' + esc(v.stoneFmt) + ' · 矿石 ' + v.ore + ' · 药材 ' + v.herb +
+      ' · 声望 ' + esc(v.fameFmt) + '<br>先升「山门大殿」，别的建筑才盖得上去。</div>' +
+    v.buildings.map(function (b) {
+      return '<div class="listrow"><div class="g"><div class="nm">' + esc(b.icon) + ' ' + esc(b.n) +
+        ' <span class="pill2" style="background:#b08a3c">Lv.' + b.lv + '/' + b.max + '</span>' +
+        (b.locked ? ' <span class="pill2" style="background:#a4584a">大殿不够</span>' : '') + '</div>' +
+        '<div class="ds">' + esc(b.out) + ' · 需 ' + esc(b.costStone) + ' 灵石 / ' + b.costOre + ' 矿</div></div>' +
+        '<button class="btn sm gold" ' + (b.can ? '' : 'disabled') + ' onclick="UI.build(\'' + b.k + '\')">升级</button></div>';
+    }).join('') + '</div></div>' + xclose();
+  return h;
+}
+function worldHtml(v) {
+  var h = dpTitle('世 界') + '<div class="inner">';
+  h += sec('山门招人') + '<div class="grid2" style="margin-bottom:6px">' +
+    '<button class="btn pri" onclick="UI.recruit()">花灵石招一人</button>' +
+    '<button class="btn" onclick="UI.open(\'ad\')">看广告白招（剩 ' + v.ad.left + ' 次）</button></div>';
+  h += sec('派差事') + v.tasks.map(function (t) {
+    return '<div class="listrow"><div class="g"><div class="nm">' + esc(t.icon) + ' ' + esc(t.n) + '</div>' +
+      '<div class="ds">' + esc(t.d) + ' · ' + esc(t.gain) + '</div></div>' +
+      '<button class="btn sm pri" ' + (t.can ? '' : 'disabled') + ' onclick="UI.task(\'' + t.k + '\')">派人</button></div>';
+  }).join('');
+  h += sec('宗门战') + v.enemies.map(function (e) {
+    return '<div class="listrow"><div class="g"><div class="nm">' + esc(e.n) + '</div>' +
+      '<div class="ds">' + esc(e.d) + '</div></div>' +
+      '<button class="btn sm gold" ' + (e.can ? '' : 'disabled') + ' onclick="UI.war(\'' + e.k + '\')">开打</button></div>';
+  }).join('');
+  h += sec('山下铺子') + '<div class="grid2">' + v.shop.map(function (it) {
+    return '<div class="listrow" style="margin-bottom:0"><div class="g"><div class="nm">' + esc(it.n) + '</div>' +
+      '<div class="ds">' + esc(it.price) + ' 灵石</div></div>' +
+      '<button class="btn sm" ' + (it.can ? '' : 'disabled') + ' onclick="UI.buy(\'' + it.k + '\')">买</button></div>';
+  }).join('') + '</div>';
+  h += '<div class="hr"></div><div class="grid2">' +
+    '<button class="btn" onclick="UI.open(\'settings\')">游历设置</button>' +
+    '<button class="btn gold" onclick="UI.retire()">就此收山 · 看结局</button></div>';
+  h += '</div></div>' + xclose();
+  return h;
+}
+function sectHtml(v) {
+  var h = dpTitle('宗 门 · ' + v.name) + '<div class="inner">';
+  h += '<div class="grid3" style="margin-bottom:8px">' +
+    '<div class="cell"><div class="k">经营</div><div class="v">' + v.year + ' 年</div></div>' +
+    '<div class="cell"><div class="k">弟子</div><div class="v">' + v.alive + '/' + v.cap + '</div></div>' +
+    '<div class="cell"><div class="k">战力</div><div class="v">' + esc(v.powerFmt) + '</div></div>' +
+    '<div class="cell"><div class="k">游历</div><div class="v">' + v.stat.travels + '</div></div>' +
+    '<div class="cell"><div class="k">突破</div><div class="v">' + v.stat.breaks + '</div></div>' +
+    '<div class="cell"><div class="k">战绩</div><div class="v">' + v.stat.wins + '/' + v.stat.loses + '</div></div></div>';
+  h += '<div class="kv"><span>路数</span><b>' + esc(v.genName) + '</b></div>' +
+    '<div class="kv"><span>开山长老</span><b>' + esc(v.masterName) + '</b></div>' +
+    '<div class="kv"><span>道侣</span><b>' + esc(v.partnerName) + '</b></div>' +
+    '<div class="kv"><span>走法编号</span><b>#' + v.comboId + '</b></div>' +
+    '<div class="kv"><span>彩蛋</span><b>' + v.eggs.length + ' 个</b></div>';
+  if (v.eggs.length) h += '<div class="hr"></div><div class="mini">' + v.eggs.slice(0, 8).map(function (e) {
+    return '<b>' + esc(e.n) + '</b>：' + esc(e.x);
+  }).join('<br>') + '</div>';
+  h += '<div class="hr"></div>' + sec('玩法提示') + '<div class="mini">' +
+    v.tips.map(function (t, i) { return (i + 1) + '. ' + esc(t); }).join('<br>') + '</div>';
+  h += '<div class="hr"></div><div class="grid2">' +
+    '<button class="btn" onclick="UI.open(\'settings\')">设置 / 广告</button>' +
+    '<button class="btn gold" onclick="UI.retire()">收山看结局</button>' +
+    '<button class="btn" onclick="UI.peekResult()">回山门看看</button>' +
+    '<button class="btn" onclick="UI.restart()">彻底重开</button></div>';
+  return h + '</div></div>' + xclose();
+}
+function settingsHtml(v) {
+  var h = dpTitle('游 历 设 置') + '<div class="inner">';
+  h += '<div class="kv"><span>自动游历</span><b>' + (v.auto ? '开着' : '关着') + '</b></div>' +
+    '<div class="kv"><span>挂机速度</span><b>×' + v.speed + '</b></div>' +
+    '<div class="kv"><span>游历令</span><b>' + esc(v.energyText) + '</b></div>' +
+    '<div class="kv"><span>今日广告</span><b>还可看 ' + v.ad.left + ' 次</b></div>';
+  h += '<div class="hr"></div><div class="grid2">' +
+    '<button class="btn ' + (v.auto ? 'pri' : '') + '" onclick="UI.setAuto(' + (v.auto ? 'false' : 'true') + ')">' +
+      (v.auto ? '关掉自动' : '开自动游历') + '</button>' +
+    '<button class="btn" onclick="UI.setSpeed(' + (v.speed >= 4 ? 1 : v.speed + 1) + ')">速度 ×' + (v.speed >= 4 ? 1 : v.speed + 1) + '</button>' +
+    '<button class="btn" onclick="UI.open(\'ad\')">机缘奖励</button>' +
+    '<button class="btn" onclick="UI.open(\'sect\')">宗门见闻</button></div>';
+  h += '<div class="hr"></div><div class="mini">自动游历时每 2 秒走一趟；路上撞见事，会停下来等你拿主意。挂机速度同时影响修为、灵石和仙历。</div>';
+
+  /* 网吧 / 公共电脑：进度带得走，也清得掉 */
+  h += '<div class="hr"></div><div class="sectttl">存 档 / 换 机 续 玩</div>';
+  h += '<div class="warnbar"><b>网吧、公用电脑注意：</b>这类机器重启会清空本机进度。' +
+    '下机前先<b>导出存档文件</b>发给自己（网盘 / 微信文件传输助手 / U 盘），换台机器用<b>导入</b>接着玩；' +
+    '最后点<b>清空本机记录</b>，别把进度留在公机上。<br>' +
+    '本机自动存档：' + (STORAGE_OK ? '<b>可用</b>' : '<b>不可用（只能手动导出）</b>') + '</div>';
+  h += '<textarea id="saveCode" class="savecode" spellcheck="false" oninput="UI.saveInput(this.value)">' +
+    esc(saveBox == null ? saveText() : saveBox) + '</textarea>';
+  h += '<div class="grid2" style="margin-top:7px">' +
+    '<button class="btn gold" onclick="UI.exportSave()">导出存档文件</button>' +
+    '<button class="btn" onclick="UI.copySave()">复制框里存档码</button>' +
+    '<label class="btn filebtn">导入存档文件<input class="fileinput" type="file" accept=".txt,.json,text/plain" onchange="UI.importFile(this)"></label>' +
+    '<button class="btn" onclick="UI.importBox()">用框里的码导入</button>' +
+    '<button class="btn" onclick="UI.wipe()">清空本机记录</button>' +
+    '<button class="btn" onclick="UI.close()">返回</button></div>';
+  h += '<div class="mini" style="margin-top:7px">存档码通常十几 KB，聊天框容易被截断，<b>优先用文件</b>；' +
+    '复制码适合贴进网盘笔记或备忘录。导出后再导入同一份，进度不会丢。</div>';
+  return h + '</div></div>' + xclose();
+}
+function adHtml(v) {
+  return '<div class="card setup"><h2>机 缘 奖 励</h2>' +
+    '<div class="lead">今天还能看 ' + v.ad.left + ' 次（小程序端接激励视频）<br>选一样，看完就能领。</div>' +
+    '<div class="pick">' + [['recruit', '白招一人'], ['double', '一笔资源'], ['scroll', '三卷残卷']].map(function (m) {
+      return '<div class="pk' + (adMode === m[0] ? ' on' : '') + '" onclick="UI.adMode(\'' + m[0] + '\')">' +
+        '<div class="t">' + m[1] + '</div></div>';
+    }).join('') + '</div>' +
+    '<div class="foot"><button class="btn gold" onclick="UI.adDone()">看完了，领</button>' +
+    '<button class="btn" onclick="UI.close()">算了</button></div></div>';
+}
+function warHtml() {
+  return '<div class="ev"><div class="cap"><div class="sun"></div><div class="ttl">战报</div></div>' +
+    '<div class="body" style="padding-top:16px">' + (warWin ? '打赢了。' : '没打过。') + '「' + esc(warTitle) + '」<br><br>' +
+    (warLines || []).map(function (p) { return parts([p]) + '<br>'; }).join('') + '</div>' +
+    '<button class="opt" onclick="UI.close()">知道了</button></div>';
+}
+function offlineHtml(v) {
+  var o = v.offline;
+  return '<div class="ev"><div class="cap"><div class="sun"></div><div class="ttl">挂机</div></div>' +
+    '<div class="body" style="padding-top:18px">你不在的 ' + o.hours + ' 小时里，弟子们自己练功、种田、下矿，没人偷懒（大概）。<br><br>' +
+    '修为 +' + esc(o.qi) + '　灵石 +' + esc(o.stone) + '</div>' +
+    '<button class="opt" onclick="UI.dismissOffline()">收下</button></div>';
+}
+function resultHtml(v) {
+  var r = v.result;
+  var h = '<div class="card rst"><div class="big" style="color:' + esc(r.c) + '">' + esc(r.n) + '</div>' +
+    '<div class="sub">' + esc(r.d) + ' · 第 ' + r.gen + ' 代 · ' + r.years + ' 年</div>' +
+    '<div class="ep">' + esc(r.ep) + '</div>' +
+    '<div class="nums"><div><div class="v">' + esc(r.powerFmt) + '</div><div class="k">最终战力</div></div>' +
+      '<div><div class="v">' + r.breaks + '</div><div class="k">突破次数</div></div>' +
+      '<div><div class="v">' + r.eggs + '</div><div class="k">彩蛋</div></div>' +
+      '<div><div class="v">' + r.disciples + '</div><div class="k">在册弟子</div></div></div>' +
+    '<div class="pct"><div class="p">大约 ' + esc(r.matchPct) + ' 的人和你一样</div>' +
+      '<div class="t">走法 #' + r.comboId + ' · ' + esc(r.route) + ' · ' + esc(r.style) + '</div></div>' +
+    '<div class="kv"><span>最强弟子</span><b>' + esc(r.top) + '（' + esc(r.topRealm) + '）</b></div>' +
+    '<div class="kv"><span>你选过最冷门一档</span><b>' + esc(r.style) + '</b></div>' +
+    '<div class="kv"><span>撞见的彩蛋</span><b>' + (r.eggList.length ? esc(r.eggList.join('、')) : '一个也没有') + '</b></div>' +
+    '<div class="foot"><button class="btn gold" onclick="UI.peekResult()">回山门看看</button>' +
+    '<button class="btn" onclick="UI.restart()">彻底重开</button></div></div>';
+  return h;
+}
+
+/* ---------------- 交互 ---------------- */
+UI.open = function (p) { open(p); };
+UI.close = function () { close(); };
+UI.sub = function (s) { sub = s; render(); };
+UI.rankTab = function (n) { rankTab = n; render(); };
+UI.pick = function (k, val) { pickBuf[k] = val; render(); };
+UI.setName = function (val) { pickBuf.name = val; };
+UI.start = function () {
+  var inp = $('sectName');
+  if (inp) pickBuf.name = inp.value || '破山门';
+  after(I.setup(G, pickBuf));
+  toast('开门了。点中间的大圆出去游历。');
+};
+UI.travel = function () { after(I.travel(G), false); };
+UI.choose = function (i) { after(I.choose(G, i), true); };
+UI.eye = function () { toast('这是 ' + (G.pending ? G.pending.who : '路上') + ' 找上门的事，选错了也有后续。'); };
+UI.breakthrough = function () { after(I.breakthrough(G)); };
+UI.openDisc = function (uid) {
+  I.focus(G, uid || G.lead); sub = 'attr'; open('disciple');
+};
+UI.equip = function (k) { after(I.equip(G, k)); };
+UI.dao = function (k) { after(I.dao(G, k)); };
+UI.pet = function (k) { after(I.pet(G, k)); };
+UI.formation = function (uid) { after(I.formation(G, uid), true); };
+UI.build = function (k) { after(I.build(G, k)); };
+UI.task = function (k) { after(I.task(G, k)); };
+UI.buy = function (k) { after(I.buy(G, k)); };
+UI.recruit = function () { after(I.recruit(G, false)); };
+UI.war = function (k) {
+  var r = I.war(G, k);
+  if (!r.ok) { toast(r.msg); return; }
+  warLines = r.lines; warTitle = r.title; warWin = r.win;
+  save(); open('war');
+};
+UI.sign = function () { after(I.sign(G, dayKey())); };
+UI.adMode = function (m) { adMode = m; render(); };
+UI.adDone = function () { var r = I.ad(G, adMode, dayKey()); if (r.ok) close(); after(r); };
+UI.setAuto = function (on) { after(I.setAuto(G, on), true); };
+UI.setSpeed = function (n) { after(I.setSpeed(G, n), true); };
+UI.dismissOffline = function () { I.dismissOffline(G); save(); render(); };
+UI.retire = function () { after(I.retire(G), true); };
+UI.peekResult = function () { I.peekResult(G); panel = ''; save(); render(); };
+UI.restart = function () {
+  G = I.restart(Date.now()); panel = ''; sub = 'attr'; lastKey = '?';
+  save(); render(); toast('重开了一局。');
+};
+
+/* ---------------- 存档导出 / 导入（网吧换机续玩） ---------------- */
+UI.saveInput = function (v) { saveBox = v; };
+UI.copySave = function () {
+  var el = $('saveCode');
+  if (!el) return;
+  el.focus(); el.select();
+  var done = false;
+  try { done = document.execCommand('copy'); } catch (e) {}
+  if (!done && navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(el.value).then(
+      function () { toast('存档码已复制，粘到网盘笔记里'); },
+      function () { toast('复制失败，请手动全选复制'); }
+    );
+    return;
+  }
+  toast(done ? '存档码已复制，粘到网盘笔记里' : '复制不了，请手动全选复制');
+};
+UI.exportSave = function () {
+  try {
+    var blob = new Blob(['\uFEFF' + saveText()], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = fileName(); a.style.display = 'none';
+    document.body.appendChild(a); a.click();
+    setTimeout(function () {
+      try { document.body.removeChild(a); URL.revokeObjectURL(url); } catch (e) {}
+    }, 800);
+    saveBox = null;
+    toast('存档文件已下载，记得传到网盘或发给自己');
+  } catch (e) {
+    toast('这台浏览器不让下载，改用「复制框里存档码」');
+  }
+};
+UI.applySave = function (txt) {
+  var g = parseSave(txt);
+  if (!g) { toast('读不出来：不是本游戏存档，或版本对不上'); return null; }
+  G = g; saveBox = null; panel = ''; sub = 'attr'; lastKey = '?';
+  save(); render();
+  toast('存档读回来了，接着玩');
+  return I.view(G);
+};
+UI.importFile = function (el) {
+  var f = el && el.files && el.files[0];
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function () { UI.applySave(r.result); };
+  r.onerror = function () { toast('文件读不出来'); };
+  r.readAsText(f, 'utf-8');
+  try { el.value = ''; } catch (e) {}
+};
+UI.importBox = function () {
+  var el = $('saveCode');
+  UI.applySave(el ? el.value : (saveBox == null ? '' : saveBox));
+};
+UI.wipe = function () {
+  try { localStorage.removeItem(I.SAVE_KEY); } catch (e) {}
+  G = I.create(Date.now()); saveBox = null; panel = ''; sub = 'attr'; lastKey = '?';
+  render(); toast('本机记录清空了，关掉浏览器就行');
+};
+
+/* ---------------- 定时挂机 ---------------- */
+function tick() {
+  if (!G) return;
+  I.tick(G, 0.5);
+  if (G.auto && !G.pending && !G.result && G.energy > 0) {
+    autoAcc += 0.5;
+    if (autoAcc >= 2) {
+      autoAcc = 0;
+      var r = I.travel(G);
+      if (r.ok) save();
+    }
+  }
+  var v = I.view(G);
+  renderHud(v);
+  var k = modalKey(v);
+  if (k !== lastKey) renderModal(v, k);
+  saveAcc += 0.5;
+  if (saveAcc >= 5) { saveAcc = 0; save(); }
+}
+
+/* ---------------- 截图 / 调试接口 ---------------- */
+window.__SUI = {
+  view: function () { return I.view(G); },
+  state: function () { return G; },
+  act: function (t, p) {
+    p = p || {};
+    var map = {
+      travel: function () { return I.travel(G, p.n); },
+      choose: function () { return I.choose(G, p.idx || 0); },
+      breakthrough: function () { return I.breakthrough(G); },
+      recruit: function () { return I.recruit(G, p.free !== false); },
+      build: function () { return I.build(G, p.k); },
+      task: function () { return I.task(G, p.k); },
+      buy: function () { return I.buy(G, p.k); },
+      equip: function () { return I.equip(G, p.k); },
+      dao: function () { return I.dao(G, p.k); },
+      pet: function () { return I.pet(G, p.k); },
+      formation: function () { return I.formation(G, p.uid); },
+      sign: function () { return I.sign(G, p.key || dayKey()); },
+      ad: function () { return I.ad(G, p.mode || 'recruit', p.key || dayKey()); },
+      war: function () { return I.war(G, p.k); },
+      retire: function () { return I.retire(G); }
+    };
+    var r = map[t] ? map[t]() : { ok: false, msg: 'no action' };
+    save(); render();
+    return r;
+  },
+  setup: function (o) {
+    o = o || {};
+    G = I.create(o.seed || 20261106);
+    I.setup(G, { name: o.name || '青崖', path: o.path || 'zheng', master: o.master || 'zhen', partner: o.partner || 'yi' });
+    panel = ''; sub = 'attr'; lastKey = '?';
+    save(); render();
+    return I.view(G);
+  },
+  clear: function () { try { localStorage.removeItem(I.SAVE_KEY); } catch (e) {} },
+  fast: function (n) {
+    for (var i = 0; i < (n || 5); i++) {
+      if (G.pending) I.choose(G, i % 3);
+      else I.travel(G);
+    }
+    save(); render();
+  },
+  finish: function () {
+    for (var i = 0; i < 200 && !G.result; i++) {
+      if (G.pending) I.choose(G, i % 3);
+      else { G.energy = 60; I.travel(G); }
+    }
+    if (!G.result) I.retire(G);
+    save(); render();
+  },
+  give: function (k, val) { G[k] = val; I.calcPower(G); save(); render(); },
+  saveText: saveText,
+  parseSave: function (t) { var g = parseSave(t); return g ? I.view(g) : null; },
+  importText: function (t) { return UI.applySave(t); },
+  storageOK: function () { return STORAGE_OK; },
+  wipe: function () { UI.wipe(); },
+  open: function (p) { open(p); },
+  panel: function (p, s) { panel = p; if (s) sub = s; render(); },
+  render: render
+};
+
+/* ---------------- 启动 ---------------- */
+G = load();
+STORAGE_OK = storageOK();
+I.offline(G, Date.now());
+render();
+if (!STORAGE_OK) {
+  setTimeout(function () { toast('这台电脑不能自动存档：下机前一定导出存档文件'); }, 900);
+}
+if (tickTimer) clearInterval(tickTimer);
+tickTimer = setInterval(tick, 500);
+window.UI = UI;
+</script>
+</body>
+</html>
